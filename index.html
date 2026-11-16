@@ -3,263 +3,331 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mines Casino</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MineGames</title>
 <style>
-* { box-sizing:border-box; }
+* { box-sizing: border-box; }
 body {
-  margin:0; background:#10131b; color:white;
-  font-family:Arial,sans-serif; min-height:100vh;
-  display:flex; justify-content:center; padding:25px 12px;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #10131c;
+  color: white;
+  text-align: center;
 }
-.container { width:100%; max-width:850px; }
-header { display:flex; justify-content:space-between;
-align-items:center; margin-bottom:30px; }
-.logo { font-size:27px; font-weight:900; color:#39d98a; }
-.balance { background:#222938; padding:13px 20px;
-border-radius:12px; font-weight:bold; }
-.game { display:grid; grid-template-columns:240px 1fr; gap:22px; }
-.panel,.board-container {
-background:#1a202c; padding:20px; border-radius:17px;
+header { padding: 24px 12px 10px; }
+h1 { color: #55e6a5; margin-bottom: 8px; }
+.balance {
+  display: inline-block;
+  background: #202638;
+  border: 1px solid #39445c;
+  border-radius: 12px;
+  padding: 12px 22px;
+  margin: 10px;
+  font-size: 21px;
+  font-weight: bold;
 }
-label { display:block; color:#aab3c2; margin:15px 0 8px; }
-input,select {
-width:100%; padding:13px; background:#101722;
-border:1px solid #354052; border-radius:9px;
-color:white; font-size:16px;
+nav { margin: 18px 0; }
+nav button, .action {
+  border: 0;
+  border-radius: 9px;
+  padding: 12px 20px;
+  margin: 5px;
+  background: #303b52;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
 }
-button { cursor:pointer; border:0; font-weight:bold;
-border-radius:9px; padding:14px; }
-.start { background:#39d98a; color:#102019;
-width:100%; margin-top:20px; font-size:16px; }
-.cashout { background:#e9b949; color:#201900;
-width:100%; margin-top:12px; font-size:16px; }
-button:disabled { opacity:.35; cursor:not-allowed; }
+nav button.active, .action.primary {
+  background: #20bd7b;
+  color: #071a12;
+  font-weight: bold;
+}
+main {
+  max-width: 520px;
+  margin: auto;
+  padding: 12px;
+}
+.panel {
+  background: #1a2030;
+  border: 1px solid #303b52;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+input, select {
+  background: #101622;
+  color: white;
+  border: 1px solid #46516a;
+  border-radius: 8px;
+  padding: 11px;
+  font-size: 16px;
+  width: 110px;
+  margin: 6px;
+}
 .grid {
-display:grid; grid-template-columns:repeat(5,1fr);
-gap:9px; max-width:480px; margin:auto;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  max-width: 360px;
+  margin: 20px auto;
 }
 .tile {
-aspect-ratio:1; background:#303d51;
-border-bottom:4px solid #202a3a;
-color:white; font-size:clamp(20px,5vw,34px);
-transition:.15s;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 9px;
+  background: #35435d;
+  color: white;
+  font-size: 25px;
+  cursor: pointer;
 }
-.tile:hover:not(:disabled) { background:#40516a; }
-.tile.safe { background:#39d98a; border-color:#20a66a; }
-.tile.bomb { background:#e34b58; border-color:#a82e3b; }
-.tile:disabled { opacity:1; }
-.stats { display:flex; justify-content:space-between;
-margin-bottom:18px; color:#aab3c2; }
-.multiplier { text-align:center; font-size:29px;
-font-weight:bold; color:#39d98a; margin:18px; }
-.message { text-align:center; color:#aab3c2;
-min-height:25px; margin-top:18px; }
-h3 { margin-top:0; }
-@media(max-width:650px) {
-.game { grid-template-columns:1fr; }
-.panel { order:2; }
-.board-container { order:1; }
-.grid { gap:6px; }
+.tile:disabled { cursor: default; }
+.tile.safe { background: #168b61; }
+.tile.mine { background: #bd394c; }
+.coin {
+  font-size: 85px;
+  margin: 20px;
+  min-height: 110px;
 }
+.result { min-height: 28px; font-weight: bold; }
+.small { color: #aab5c9; font-size: 13px; }
+.hidden { display: none; }
 </style>
 </head>
 <body>
-<div class="container">
+
 <header>
-  <div class="logo">💎 MINES</div>
-  <div class="balance">Saldo: <span id="balance">1000.00</span> kr</div>
+  <h1>🎮 MineGames</h1>
+  <div class="balance">💰 Saldo: <span id="balance">1000</span> coins</div>
+  <div class="small">Mines och Coin Flip delar samma saldo</div>
 </header>
 
-<div class="game">
-  <div class="panel">
-    <h3>Inställningar</h3>
-    <label>Insats (kr)</label>
-    <input id="bet" type="number" value="10" min="1" max="1000">
+<nav>
+  <button id="minesTab" class="active" onclick="showGame('mines')">💣 Mines</button>
+  <button id="coinTab" onclick="showGame('coin')">🪙 Coin Flip</button>
+</nav>
 
-    <label>Antal minor</label>
-    <select id="mines">
-      <option value="1">1 mina</option>
-      <option value="3">3 minor</option>
-      <option value="5" selected>5 minor</option>
-      <option value="8">8 minor</option>
-      <option value="10">10 minor</option>
-      <option value="15">15 minor</option>
-      <option value="20">20 minor</option>
-      <option value="24">24 minor</option>
-    </select>
+<main>
+  <section id="minesGame" class="panel">
+    <h2>💣 Mines</h2>
+    <p>Välj hur många minor du vill spela med.</p>
 
-    <button class="start" id="start" onclick="startGame()">
-      STARTA SPEL
-    </button>
-    <button class="cashout" id="cashout" onclick="cashOut()" disabled>
-      CASH OUT
-    </button>
-    <p style="color:#8995a7;font-size:12px;line-height:1.5">
-      Demo med virtuella pengar. Inga riktiga insättningar
-      eller uttag.
-    </p>
-  </div>
-
-  <div class="board-container">
-    <div class="stats">
-      <span>Hittade diamanter: <b id="found">0</b></span>
-      <span>Minor: <b id="mineCount">5</b></span>
+    <div>
+      <label>Insats:</label>
+      <input id="minesBet" type="number" min="1" value="50">
+      <label>Minor:</label>
+      <select id="mineCount">
+        <option value="1">1</option>
+        <option value="3" selected>3</option>
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+      </select>
     </div>
-    <div class="multiplier" id="multiplier">1.00x</div>
-    <div class="grid" id="grid"></div>
-    <div class="message" id="message">
-      Välj insats och tryck på Starta spel!
+
+    <button class="action primary" id="startMines" onclick="startMines()">Starta spel</button>
+    <div class="grid" id="mineGrid"></div>
+    <h3>Multiplikator: <span id="multiplier">1.00</span>x</h3>
+    <p class="result" id="minesResult">Starta ett spel för att börja!</p>
+    <button class="action primary" id="cashout" onclick="cashout()" disabled>Cash Out</button>
+  </section>
+
+  <section id="coinGame" class="panel hidden">
+    <h2>🪙 Coin Flip</h2>
+    <p>Välj krona eller klave. Rätt gissning ger 2x insatsen tillbaka.</p>
+
+    <div>
+      <label>Insats:</label>
+      <input id="coinBet" type="number" min="1" value="50">
     </div>
-  </div>
-</div>
-</div>
+
+    <div>
+      <button class="action" onclick="chooseSide('krona')" id="heads">👑 Krona</button>
+      <button class="action" onclick="chooseSide('klave')" id="tails">🦅 Klave</button>
+    </div>
+
+    <div class="coin" id="coin">🪙</div>
+    <p class="result" id="coinResult">Välj krona eller klave!</p>
+    <button class="action primary" onclick="flipCoin()">Kasta myntet</button>
+  </section>
+
+  <p class="small">Endast virtuella coins. Inga riktiga pengar används.</p>
+  <button class="action" onclick="resetBalance()">Återställ saldo till 1000</button>
+</main>
 
 <script>
-let balance = 1000;
-let bet = 0;
-let minePositions = [];
+let balance = Number(localStorage.getItem("minegamesBalance")) || 1000;
+
+let mines = [];
 let revealed = [];
-let mineCount = 5;
-let multiplier = 1;
-let playing = false;
-let roundOver = false;
+let mineBet = 0;
+let mineActive = false;
+let safeCount = 0;
+let mineMultiplier = 1;
+let selectedSide = null;
 
-const $ = id => document.getElementById(id);
-
-function update() {
-  $("balance").textContent = balance.toFixed(2);
-  $("found").textContent = revealed.length;
-  $("mineCount").textContent = mineCount;
-  $("multiplier").textContent = multiplier.toFixed(2) + "x";
-  $("cashout").disabled = !playing || revealed.length === 0;
+function updateBalance() {
+  document.getElementById("balance").textContent = balance.toFixed(0);
+  localStorage.setItem("minegamesBalance", balance);
 }
 
-function randomMines(count) {
-  let positions = [];
-  while (positions.length < count) {
-    let n = crypto.getRandomValues(new Uint32Array(1))[0] % 25;
-    if (!positions.includes(n)) positions.push(n);
+function showGame(game) {
+  document.getElementById("minesGame").classList.toggle("hidden", game !== "mines");
+  document.getElementById("coinGame").classList.toggle("hidden", game !== "coin");
+  document.getElementById("minesTab").classList.toggle("active", game === "mines");
+  document.getElementById("coinTab").classList.toggle("active", game === "coin");
+}
+
+function resetBalance() {
+  if (confirm("Vill du återställa saldot till 1000 coins?")) {
+    balance = 1000;
+    updateBalance();
   }
-  return positions;
 }
 
-function startGame() {
-  if (playing) return;
+function startMines() {
+  if (mineActive) return;
 
-  bet = Number($("bet").value);
-  mineCount = Number($("mines").value);
+  const bet = Number(document.getElementById("minesBet").value);
+  const count = Number(document.getElementById("mineCount").value);
 
-  if (!Number.isFinite(bet) || bet <= 0 || bet > balance) {
-    $("message").textContent = "Ogiltig insats eller för lågt saldo!";
+  if (!Number.isInteger(bet) || bet < 1 || bet > balance) {
+    alert("Ange en giltig insats som inte överstiger ditt saldo.");
     return;
   }
 
+  mineBet = bet;
   balance -= bet;
-  minePositions = randomMines(mineCount);
-  revealed = [];
-  multiplier = 1;
-  playing = true;
-  roundOver = false;
+  updateBalance();
 
-  $("start").disabled = true;
-  $("bet").disabled = true;
-  $("mines").disabled = true;
-  $("message").textContent = "Hitta diamanterna och undvik minorna!";
+  mines = [];
+  revealed = [];
+  safeCount = 0;
+  mineMultiplier = 1;
+  mineActive = true;
+
+  while (mines.length < count) {
+    const position = Math.floor(Math.random() * 25);
+    if (!mines.includes(position)) mines.push(position);
+  }
+
+  document.getElementById("minesResult").textContent = "Hitta diamanter och undvik minorna!";
+  document.getElementById("multiplier").textContent = "1.00";
+  document.getElementById("cashout").disabled = true;
+  document.getElementById("startMines").disabled = true;
+
   renderGrid();
-  update();
 }
 
 function renderGrid() {
-  const grid = $("grid");
+  const grid = document.getElementById("mineGrid");
   grid.innerHTML = "";
 
   for (let i = 0; i < 25; i++) {
     const tile = document.createElement("button");
     tile.className = "tile";
-    tile.textContent = "◆";
+    tile.textContent = "?";
+    tile.disabled = !mineActive || revealed.includes(i);
+    tile.onclick = () => revealTile(i);
 
     if (revealed.includes(i)) {
-      tile.classList.add("safe");
-      tile.textContent = "💎";
-      tile.disabled = true;
+      if (mines.includes(i)) {
+        tile.textContent = "💣";
+        tile.classList.add("mine");
+      } else {
+        tile.textContent = "💎";
+        tile.classList.add("safe");
+      }
     }
-
-    tile.onclick = () => clickTile(i);
     grid.appendChild(tile);
   }
 }
 
-function calculateMultiplier(safeCount) {
-  let probability = 1;
-  for (let i = 0; i < safeCount; i++) {
-    probability *= (25 - mineCount - i) / (25 - i);
-  }
-  return 0.99 / probability;
-}
+function revealTile(index) {
+  if (!mineActive || revealed.includes(index)) return;
 
-function clickTile(index) {
-  if (!playing || revealed.includes(index)) return;
+  revealed.push(index);
 
-  if (minePositions.includes(index)) {
-    playing = false;
-    roundOver = true;
-    revealAll();
-    $("message").textContent = "💥 BOOM! Du förlorade insatsen.";
-    $("start").disabled = false;
-    $("bet").disabled = false;
-    $("mines").disabled = false;
-    update();
+  if (mines.includes(index)) {
+    mineActive = false;
+    renderGrid();
+    document.getElementById("minesResult").textContent = "💥 Du träffade en mina! Du förlorade insatsen.";
+    document.getElementById("startMines").disabled = false;
+    document.getElementById("cashout").disabled = true;
     return;
   }
 
-  revealed.push(index);
-  multiplier = calculateMultiplier(revealed.length);
+  safeCount++;
+  const totalSafe = 25 - mines.length;
+  mineMultiplier = 0.97 * (25 / (25 - mines.length));
+
+  for (let i = 1; i < safeCount; i++) {
+    mineMultiplier *= (25 - i) / (25 - mines.length - i);
+  }
+
+  document.getElementById("multiplier").textContent = mineMultiplier.toFixed(2);
+  document.getElementById("minesResult").textContent = "💎 Snyggt! Du kan fortsätta eller ta ut vinsten.";
+  document.getElementById("cashout").disabled = false;
 
   renderGrid();
-  update();
+}
 
-  $("message").textContent =
-    "💎 Diamant hittad! Du kan fortsätta eller ta ut vinsten.";
+function cashout() {
+  if (!mineActive || safeCount === 0) return;
 
-  if (revealed.length === 25 - mineCount) {
-    cashOut();
+  const winnings = mineBet * mineMultiplier;
+  balance += winnings;
+  updateBalance();
+
+  mineActive = false;
+  document.getElementById("minesResult").textContent =
+    "🎉 Du tog ut " + winnings.toFixed(2) + " coins!";
+  document.getElementById("cashout").disabled = true;
+  document.getElementById("startMines").disabled = false;
+  renderGrid();
+}
+
+function chooseSide(side) {
+  selectedSide = side;
+  document.getElementById("heads").style.outline = side === "krona" ? "2px solid #55e6a5" : "none";
+  document.getElementById("tails").style.outline = side === "klave" ? "2px solid #55e6a5" : "none";
+  document.getElementById("coinResult").textContent = "Du valde " + side + ". Tryck på Kasta myntet!";
+}
+
+function flipCoin() {
+  if (!selectedSide) {
+    alert("Välj krona eller klave först!");
+    return;
+  }
+
+  const bet = Number(document.getElementById("coinBet").value);
+
+  if (!Number.isInteger(bet) || bet < 1 || bet > balance) {
+    alert("Ange en giltig insats som inte överstiger ditt saldo.");
+    return;
+  }
+
+  balance -= bet;
+  updateBalance();
+
+  const result = Math.random() < 0.5 ? "krona" : "klave";
+  document.getElementById("coin").textContent = result === "krona" ? "👑" : "🦅";
+
+  if (selectedSide === result) {
+    const winnings = bet * 2;
+    balance += winnings;
+    updateBalance();
+    document.getElementById("coinResult").textContent =
+      "🎉 Rätt! Du vann " + winnings + " coins!";
+  } else {
+    document.getElementById("coinResult").textContent =
+      "❌ Det blev " + result + ". Du förlorade insatsen.";
   }
 }
 
-function revealAll() {
-  const tiles = document.querySelectorAll(".tile");
-  tiles.forEach((tile, i) => {
-    if (minePositions.includes(i)) {
-      tile.classList.add("bomb");
-      tile.textContent = "💣";
-    } else if (revealed.includes(i)) {
-      tile.classList.add("safe");
-      tile.textContent = "💎";
-    }
-    tile.disabled = true;
-  });
-}
-
-function cashOut() {
-  if (!playing || revealed.length === 0) return;
-
-  const winnings = bet * multiplier;
-  balance += winnings;
-  playing = false;
-
-  revealAll();
-  $("message").textContent =
-    "🎉 Du tog ut " + winnings.toFixed(2) + " kr!";
-
-  $("start").disabled = false;
-  $("bet").disabled = false;
-  $("mines").disabled = false;
-  update();
-}
-
+updateBalance();
 renderGrid();
-update();
 </script>
 </body>
 </html>
+
