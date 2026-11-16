@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tap Reborn – Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#10151c;color:white;font-family:Arial,sans-serif}
+header{background:#192630;padding:25px;text-align:center;border-bottom:2px solid #31d69b}
+h1{color:#31d69b;margin:0}
+main{max-width:950px;width:94%;margin:25px auto}
+.panel{background:#1b2732;border:1px solid #344452;border-radius:12px;padding:20px;margin-bottom:18px}
+input,button{padding:12px;border:0;border-radius:7px;font-size:15px;margin:5px 0}
+input{display:block;width:100%;background:#101820;color:white;border:1px solid #40515f}
+button{background:#31d69b;color:#07150f;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.reject{background:#c94d5b;color:white}
+.secondary{background:#344452;color:white}
+.item{background:#101820;border-radius:8px;padding:13px;margin:10px 0;overflow-wrap:anywhere}
+.muted{color:#aab8c4;font-size:13px}
+.hidden{display:none}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions button{flex:1}
+#message{padding:12px;background:#344452;border-radius:8px;margin-bottom:15px;display:none}
+</style>
+</head>
+<body>
+<header>
+<h1>⚡ TAP REBORN ADMIN</h1>
+<p>Administratörspanel</p>
+</header>
+
+<main>
+<div id="message"></div>
+
+<section id="login" class="panel">
+<h2>Admininloggning</h2>
+<input id="email" type="email" placeholder="E-post">
+<input id="password" type="password" placeholder="Lösenord">
+<button onclick="login()">Logga in</button>
+</section>
+
+<section id="admin" class="hidden">
+<div class="panel">
+<h2>Adminöversikt</h2>
+<p>Du är inloggad som administratör.</p>
+<div class="actions">
+<button onclick="refreshAll()">Uppdatera</button>
+<button class="secondary" onclick="logout()">Logga ut</button>
+</div>
+</div>
+
+<div class="panel">
+<h2>👥 Användare</h2>
+<div id="users">Laddar...</div>
+</div>
+
+<div class="panel">
+<h2>🪙 Tokenförfrågningar</h2>
+<div id="requests">Laddar...</div>
+</div>
+</section>
+</main>
+
+<script>
+const SUPABASE_URL = "https://phqyeqlqifapboesrypq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_-_tdVIMnO-1W7yhuOywpCA_77CZ-6s1";
+const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const message = document.getElementById("message");
+
+function say(text){
+  message.textContent=text;
+  message.style.display="block";
+}
+function clearMessage(){
+  message.textContent="";
+  message.style.display="none";
+}
+
+function element(tag,text){
+  const el=document.createElement(tag);
+  el.textContent=text;
+  return el;
+}
+
+async function login(){
+  clearMessage();
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value;
+
+  const {error}=await db.auth.signInWithPassword({email,password});
+  if(error){say(error.message);return;}
+  await checkAdmin();
+}
+
+async function logout(){
+  await db.auth.signOut();
+  document.getElementById("admin").classList.add("hidden");
+  document.getElementById("login").classList.remove("hidden");
+  say("Du har loggat ut.");
+}
+
+async function checkAdmin(){
+  clearMessage();
+  const {data:{user}}=await db.auth.getUser();
+
+  if(!user){
+    document.getElementById("admin").classList.add("hidden");
+    document.getElementById("login").classList.remove("hidden");
+    return;
+  }
+
+  const {data,error}=await db.rpc("is_admin");
+
+  if(error || data!==true){
+    document.getElementById("admin").classList.add("hidden");
+    document.getElementById("login").classList.remove("hidden");
+    say("Det här kontot har inte administratörsbehörighet.");
+    return;
+  }
+
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("admin").classList.remove("hidden");
+  await refreshAll();
+}
+
+async function refreshAll(){
+  clearMessage();
+  await Promise.all([loadUsers(),loadRequests()]);
+}
+
+async function loadUsers(){
+  const container=document.getElementById("users");
+  container.replaceChildren(element("p","Laddar användare..."));
+
+  const {data,error}=await db
+    .from("profiles")
+    .select("id,username,balance,created_at")
+    .order("created_at",{ascending:false});
+
+  container.replaceChildren();
+
+  if(error){
+    container.textContent="Kunde inte läsa användarna: "+error.message;
+    return;
+  }
+
+  if(!data.length){
+    container.textContent="Inga användare hittades.";
+    return;
+  }
+
+  data.forEach(user=>{
+    const card=document.createElement("div");
+    card.className="item";
+    card.append(
+      element("strong",user.username || "Spelare"),
+      element("p","Saldo: "+Number(user.balance).toLocaleString("sv-SE")+" tokens"),
+      element("p","User ID: "+user.id)
+    );
+    container.append(card);
+  });
+}
+
+async function loadRequests(){
+  const container=document.getElementById("requests");
+  container.replaceChildren(element("p","Laddar förfrågningar..."));
+
+  const {data,error}=await db
+    .from("token_requests")
+    .select("id,user_id,request_type,amount,status,created_at")
+    .order("created_at",{ascending:false});
+
+  container.replaceChildren();
+
+  if(error){
+    container.textContent="Kunde inte läsa förfrågningarna: "+error.message;
+    return;
+  }
+
+  if(!data.length){
+    container.textContent="Inga förfrågningar ännu.";
+    return;
+  }
+
+  data.forEach(req=>{
+    const card=document.createElement("div");
+    card.className="item";
+
+    const type=req.request_type==="deposit"?"Insättning":"Uttag";
+    card.append(
+      element("strong",type+" – "+req.amount+" tokens"),
+      element("p","Status: "+req.status),
+      element("p","Användar-ID: "+req.user_id),
+      element("p","Förfrågan: "+req.id)
+    );
+
+    if(req.status==="pending"){
+      const actions=document.createElement("div");
+      actions.className="actions";
+
+      const approve=element("button","Godkänn");
+      approve.onclick=()=>processRequest(req.id,"approve",approve,actions);
+
+      const reject=element("button","Avslå");
+      reject.className="reject";
+      reject.onclick=()=>processRequest(req.id,"reject",reject,actions);
+
+      actions.append(approve,reject);
+      card.append(actions);
+    }
+
+    container.append(card);
+  });
+}
+
+async function processRequest(id,action,button,actions){
+  if(!confirm(action==="approve"?"Godkänna förfrågan?":"Avslå förfrågan?"))return;
+
+  actions.querySelectorAll("button").forEach(b=>b.disabled=true);
+
+  const functionName=action==="approve"
+    ?"approve_token_request"
+    :"reject_token_request";
+
+  const {error}=await db.rpc(functionName,{request_id:id});
+
+  if(error){
+    say("Fel: "+error.message);
+    actions.querySelectorAll("button").forEach(b=>b.disabled=false);
+    return;
+  }
+
+  say(action==="approve"?"Förfrågan godkänd!":"Förfrågan avslagen!");
+  await refreshAll();
+}
+
+db.auth.onAuthStateChange(()=>{
+  setTimeout(checkAdmin,0);
+});
+
+checkAdmin();
+</script>
+</body>
+</html>
