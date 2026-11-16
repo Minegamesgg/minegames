@@ -14,20 +14,20 @@ body {
   color: white;
   text-align: center;
 }
-header { padding: 24px 12px 10px; }
-h1 { color: #55e6a5; margin-bottom: 8px; }
+header { padding: 25px 12px 10px; }
+h1 { color: #55e6a5; font-size: 32px; }
 .balance {
   display: inline-block;
   background: #202638;
   border: 1px solid #39445c;
   border-radius: 12px;
-  padding: 12px 22px;
+  padding: 13px 22px;
   margin: 10px;
   font-size: 21px;
   font-weight: bold;
 }
 nav { margin: 18px 0; }
-nav button, .action {
+button {
   border: 0;
   border-radius: 9px;
   padding: 12px 20px;
@@ -37,16 +37,13 @@ nav button, .action {
   font-size: 16px;
   cursor: pointer;
 }
-nav button.active, .action.primary {
+button:disabled { opacity: .45; cursor: not-allowed; }
+nav button.active, .primary {
   background: #20bd7b;
   color: #071a12;
   font-weight: bold;
 }
-main {
-  max-width: 520px;
-  margin: auto;
-  padding: 12px;
-}
+main { max-width: 520px; margin: auto; padding: 12px; }
 .panel {
   background: #1a2030;
   border: 1px solid #303b52;
@@ -78,16 +75,12 @@ input, select {
   background: #35435d;
   color: white;
   font-size: 25px;
-  cursor: pointer;
+  padding: 0;
+  margin: 0;
 }
-.tile:disabled { cursor: default; }
 .tile.safe { background: #168b61; }
 .tile.mine { background: #bd394c; }
-.coin {
-  font-size: 85px;
-  margin: 20px;
-  min-height: 110px;
-}
+.coin { font-size: 85px; margin: 20px; min-height: 110px; }
 .result { min-height: 28px; font-weight: bold; }
 .small { color: #aab5c9; font-size: 13px; }
 .hidden { display: none; }
@@ -98,7 +91,7 @@ input, select {
 <header>
   <h1>🎮 MineGames</h1>
   <div class="balance">💰 Saldo: <span id="balance">1000</span> coins</div>
-  <div class="small">Mines och Coin Flip delar samma saldo</div>
+  <div class="small">20 % husfördel • Gemensamt saldo</div>
 </header>
 
 <nav>
@@ -107,56 +100,61 @@ input, select {
 </nav>
 
 <main>
-  <section id="minesGame" class="panel">
-    <h2>💣 Mines</h2>
-    <p>Välj hur många minor du vill spela med.</p>
+<section id="minesGame" class="panel">
+  <h2>💣 Mines</h2>
+  <p>Undvik minorna och hitta diamanter!</p>
 
-    <div>
-      <label>Insats:</label>
-      <input id="minesBet" type="number" min="1" value="50">
-      <label>Minor:</label>
-      <select id="mineCount">
-        <option value="1">1</option>
-        <option value="3" selected>3</option>
-        <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="15">15</option>
-        <option value="20">20</option>
-      </select>
-    </div>
+  <div>
+    <label>Insats:</label>
+    <input id="minesBet" type="number" min="1" value="50">
+    <label>Minor:</label>
+    <select id="mineCount">
+      <option value="1">1</option>
+      <option value="3" selected>3</option>
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="15">15</option>
+      <option value="20">20</option>
+    </select>
+  </div>
 
-    <button class="action primary" id="startMines" onclick="startMines()">Starta spel</button>
-    <div class="grid" id="mineGrid"></div>
-    <h3>Multiplikator: <span id="multiplier">1.00</span>x</h3>
-    <p class="result" id="minesResult">Starta ett spel för att börja!</p>
-    <button class="action primary" id="cashout" onclick="cashout()" disabled>Cash Out</button>
-  </section>
+  <button class="primary" id="startMines" onclick="startMines()">Starta spel</button>
+  <div class="grid" id="mineGrid"></div>
 
-  <section id="coinGame" class="panel hidden">
-    <h2>🪙 Coin Flip</h2>
-    <p>Välj krona eller klave. Rätt gissning ger 2x insatsen tillbaka.</p>
+  <h3>Multiplikator: <span id="multiplier">1.00</span>x</h3>
+  <p class="result" id="minesResult">Starta ett spel för att börja!</p>
+  <button class="primary" id="cashout" onclick="cashout()" disabled>Cash Out</button>
+</section>
 
-    <div>
-      <label>Insats:</label>
-      <input id="coinBet" type="number" min="1" value="50">
-    </div>
+<section id="coinGame" class="panel hidden">
+  <h2>🪙 Coin Flip</h2>
+  <p>Välj krona eller klave. Rätt gissning ger 1,6x tillbaka.</p>
 
-    <div>
-      <button class="action" onclick="chooseSide('krona')" id="heads">👑 Krona</button>
-      <button class="action" onclick="chooseSide('klave')" id="tails">🦅 Klave</button>
-    </div>
+  <div>
+    <label>Insats:</label>
+    <input id="coinBet" type="number" min="1" value="50">
+  </div>
 
-    <div class="coin" id="coin">🪙</div>
-    <p class="result" id="coinResult">Välj krona eller klave!</p>
-    <button class="action primary" onclick="flipCoin()">Kasta myntet</button>
-  </section>
+  <div>
+    <button id="heads" onclick="chooseSide('krona')">👑 Krona</button>
+    <button id="tails" onclick="chooseSide('klave')">🦅 Klave</button>
+  </div>
 
-  <p class="small">Endast virtuella coins. Inga riktiga pengar används.</p>
-  <button class="action" onclick="resetBalance()">Återställ saldo till 1000</button>
+  <div class="coin" id="coin">🪙</div>
+  <p class="result" id="coinResult">Välj krona eller klave!</p>
+  <button class="primary" onclick="flipCoin()">Kasta myntet</button>
+</section>
+
+<p class="small">Endast virtuella coins. Inga riktiga pengar används.</p>
+<button onclick="resetBalance()">Återställ saldo till 1000</button>
 </main>
 
 <script>
-let balance = Number(localStorage.getItem("minegamesBalance")) || 1000;
+const HOUSE_EDGE = 0.20;
+const COIN_PAYOUT = 1.6;
+
+let savedBalance = localStorage.getItem("minegamesBalance");
+let balance = savedBalance === null ? 1000 : Number(savedBalance);
 
 let mines = [];
 let revealed = [];
@@ -167,7 +165,7 @@ let mineMultiplier = 1;
 let selectedSide = null;
 
 function updateBalance() {
-  document.getElementById("balance").textContent = balance.toFixed(0);
+  document.getElementById("balance").textContent = balance.toFixed(2);
   localStorage.setItem("minegamesBalance", balance);
 }
 
@@ -211,12 +209,24 @@ function startMines() {
     if (!mines.includes(position)) mines.push(position);
   }
 
-  document.getElementById("minesResult").textContent = "Hitta diamanter och undvik minorna!";
+  document.getElementById("minesResult").textContent =
+    "Hitta diamanter och undvik minorna!";
   document.getElementById("multiplier").textContent = "1.00";
   document.getElementById("cashout").disabled = true;
   document.getElementById("startMines").disabled = true;
 
   renderGrid();
+}
+
+function calculateMultiplier() {
+  const totalSafe = 25 - mines.length;
+  let fairMultiplier = 1;
+
+  for (let i = 0; i < safeCount; i++) {
+    fairMultiplier *= (25 - i) / (totalSafe - i);
+  }
+
+  return fairMultiplier * (1 - HOUSE_EDGE);
 }
 
 function renderGrid() {
@@ -251,24 +261,24 @@ function revealTile(index) {
   if (mines.includes(index)) {
     mineActive = false;
     renderGrid();
-    document.getElementById("minesResult").textContent = "💥 Du träffade en mina! Du förlorade insatsen.";
+
+    document.getElementById("minesResult").textContent =
+      "💥 Du träffade en mina! Du förlorade insatsen.";
     document.getElementById("startMines").disabled = false;
     document.getElementById("cashout").disabled = true;
     return;
   }
 
   safeCount++;
-  const totalSafe = 25 - mines.length;
-  mineMultiplier = 0.97 * (25 / (25 - mines.length));
+  mineMultiplier = calculateMultiplier();
 
-  for (let i = 1; i < safeCount; i++) {
-    mineMultiplier *= (25 - i) / (25 - mines.length - i);
-  }
+  document.getElementById("multiplier").textContent =
+    mineMultiplier.toFixed(2);
 
-  document.getElementById("multiplier").textContent = mineMultiplier.toFixed(2);
-  document.getElementById("minesResult").textContent = "💎 Snyggt! Du kan fortsätta eller ta ut vinsten.";
+  document.getElementById("minesResult").textContent =
+    "💎 Snyggt! Du kan fortsätta eller ta ut vinsten.";
+
   document.getElementById("cashout").disabled = false;
-
   renderGrid();
 }
 
@@ -280,8 +290,10 @@ function cashout() {
   updateBalance();
 
   mineActive = false;
+
   document.getElementById("minesResult").textContent =
     "🎉 Du tog ut " + winnings.toFixed(2) + " coins!";
+
   document.getElementById("cashout").disabled = true;
   document.getElementById("startMines").disabled = false;
   renderGrid();
@@ -289,9 +301,15 @@ function cashout() {
 
 function chooseSide(side) {
   selectedSide = side;
-  document.getElementById("heads").style.outline = side === "krona" ? "2px solid #55e6a5" : "none";
-  document.getElementById("tails").style.outline = side === "klave" ? "2px solid #55e6a5" : "none";
-  document.getElementById("coinResult").textContent = "Du valde " + side + ". Tryck på Kasta myntet!";
+
+  document.getElementById("heads").style.outline =
+    side === "krona" ? "2px solid #55e6a5" : "none";
+
+  document.getElementById("tails").style.outline =
+    side === "klave" ? "2px solid #55e6a5" : "none";
+
+  document.getElementById("coinResult").textContent =
+    "Du valde " + side + ". Tryck på Kasta myntet!";
 }
 
 function flipCoin() {
@@ -311,14 +329,17 @@ function flipCoin() {
   updateBalance();
 
   const result = Math.random() < 0.5 ? "krona" : "klave";
-  document.getElementById("coin").textContent = result === "krona" ? "👑" : "🦅";
+
+  document.getElementById("coin").textContent =
+    result === "krona" ? "👑" : "🦅";
 
   if (selectedSide === result) {
-    const winnings = bet * 2;
+    const winnings = bet * COIN_PAYOUT;
     balance += winnings;
     updateBalance();
+
     document.getElementById("coinResult").textContent =
-      "🎉 Rätt! Du vann " + winnings + " coins!";
+      "🎉 Rätt! Du vann " + winnings.toFixed(2) + " coins!";
   } else {
     document.getElementById("coinResult").textContent =
       "❌ Det blev " + result + ". Du förlorade insatsen.";
