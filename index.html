@@ -1,424 +1,408 @@
 
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tap Simulator Reborn</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #10151c;
-      color: white;
-    }
-
-    header {
-      text-align: center;
-      padding: 28px 15px;
-      background: #18232d;
-      border-bottom: 2px solid #31d69b;
-    }
-
-    h1 { margin: 0; color: #31d69b; }
-
-    main {
-      width: 92%;
-      max-width: 480px;
-      margin: 30px auto;
-    }
-
-    .panel {
-      background: #1b2732;
-      padding: 22px;
-      border-radius: 14px;
-      margin-bottom: 18px;
-      border: 1px solid #344452;
-    }
-
-    h2 { margin-top: 0; }
-
-    input, button {
-      width: 100%;
-      padding: 13px;
-      margin-top: 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 16px;
-    }
-
-    input {
-      background: #101820;
-      color: white;
-      border: 1px solid #40515f;
-    }
-
-    button {
-      background: #31d69b;
-      color: #07150f;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover { background: #21b982; }
-
-    button.secondary {
-      background: #344452;
-      color: white;
-    }
-
-    button.danger {
-      background: #c94d5b;
-      color: white;
-    }
-
-    .balance {
-      font-size: 34px;
-      color: #31d69b;
-      font-weight: bold;
-      text-align: center;
-      margin: 20px 0;
-    }
-
-    .muted { color: #aab8c4; }
-
-    .request {
-      background: #101820;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 10px;
-      overflow-wrap: anywhere;
-    }
-
-    #message {
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      display: none;
-      background: #344452;
-    }
-
-    .hidden { display: none; }
-
-    footer {
-      text-align: center;
-      color: #82909b;
-      padding: 25px;
-      font-size: 13px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tap Simulator Reborn</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1020;color:#fff;font-family:Arial,sans-serif}
+header{padding:22px;text-align:center;background:#121b32;border-bottom:1px solid #293858}
+header h1{margin:0;color:#8e9dff;font-size:30px}
+header p{color:#9eaccb}
+.wallet{background:#192747;padding:16px;border-radius:15px;margin:15px auto;max-width:300px}
+.wallet strong{font-size:26px;color:#66f0d0}
+main{max-width:850px;margin:auto;padding:16px}
+nav{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+button{border:0;border-radius:12px;padding:13px;font-size:15px;font-weight:bold;cursor:pointer;background:#293b65;color:white}
+button:hover{filter:brightness(1.2)}
+nav button{background:#182849;padding:20px 8px;border:1px solid #344b7b}
+nav button.active{background:#5555c9}
+.panel{display:none;margin-top:18px;background:#131e37;padding:20px;border-radius:17px;border:1px solid #293858}
+.panel.active{display:block}
+h2{color:#a5b3ff;margin-top:0}
+input,select{padding:12px;border-radius:9px;border:1px solid #465b83;background:#0b1429;color:white;width:100%;margin:7px 0 13px}
+.action{background:#635be9;margin:5px 3px}
+.good{color:#65e8bb}
+.bad{color:#ff7777}
+.muted{color:#a8b5d0}
+.big{font-size:28px;font-weight:bold}
+#mineGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:16px 0}
+.mineCell{aspect-ratio:1;background:#293b65;font-size:23px;padding:5px}
+.mineCell.revealed{background:#246c65}
+.mineCell.bomb{background:#a33b50}
+.cards{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;min-height:75px}
+.card{background:#fff;color:#171717;border-radius:9px;padding:12px 9px;font-size:22px;min-width:48px;text-align:center;font-weight:bold}
+.red{color:#d22}
+.hand{background:#1b2a4b;padding:12px;border-radius:12px;margin:12px 0}
+footer{text-align:center;color:#7484a6;padding:25px;font-size:12px}
+#message{min-height:25px;margin:12px 0;font-weight:bold}
+</style>
 </head>
-
 <body>
 
 <header>
-  <h1>⚡ TAP SIMULATOR REBORN</h1>
-  <p>Collect tokens. Have fun.</p>
+<h1>⚡ TAP SIMULATOR REBORN</h1>
+<p>Play. Win. Collect tokens.</p>
+<div class="wallet">
+<div class="muted">YOUR BALANCE</div>
+<strong id="balance">1 000</strong> tokens
+</div>
 </header>
 
 <main>
-  <div id="message"></div>
+<nav>
+<button class="active" onclick="showGame('tap',this)">⚡ Tap</button>
+<button onclick="showGame('mines',this)">💣 Mines</button>
+<button onclick="showGame('coin',this)">🪙 Coin Flip</button>
+<button onclick="showGame('blackjack',this)">🃏 Blackjack</button>
+</nav>
 
-  <!-- LOGIN OCH REGISTRERING -->
-  <section id="authSection" class="panel">
-    <h2>Logga in eller skapa konto</h2>
+<div id="message"></div>
 
-    <input id="username" placeholder="Användarnamn (vid registrering)">
-    <input id="email" type="email" placeholder="E-postadress">
-    <input id="password" type="password" placeholder="Lösenord">
+<section id="tap" class="panel active">
+<h2>⚡ Tap Simulator</h2>
+<p>Tap the button to earn virtual tokens!</p>
+<div class="big" id="tapCount">0</div>
+<p class="muted">Total taps this session</p>
+<button class="action" style="width:100%;padding:25px;font-size:24px" onclick="tap()">TAP!</button>
+</section>
 
-    <button onclick="signUp()">Skapa konto</button>
-    <button class="secondary" onclick="signIn()">Logga in</button>
+<section id="mines" class="panel">
+<h2>💣 Mines</h2>
+<p>Choose your bet and number of mines. Find safe tiles and cash out before hitting a mine!</p>
+<label>Bet</label>
+<input id="mineBet" type="number" min="1" value="50">
+<label>Number of mines</label>
+<select id="mineCount">
+<option value="3">3 mines</option>
+<option value="5">5 mines</option>
+<option value="8">8 mines</option>
+<option value="10">10 mines</option>
+<option value="15">15 mines</option>
+<option value="20">20 mines</option>
+</select>
+<button class="action" onclick="startMines()">Start game</button>
+<button class="action" onclick="cashoutMines()">Cash out</button>
+<div id="mineInfo" class="muted">Start a game to play.</div>
+<div id="mineGrid"></div>
+</section>
 
-    <p class="muted">
-      När du skapar ett konto får du 1 000 virtuella testtokens.
-    </p>
-  </section>
+<section id="coin" class="panel">
+<h2>🪙 Coin Flip</h2>
+<p>Pick a side. Your selected side has a 40% chance of winning. The other side has a 60% chance.</p>
+<label>Bet</label>
+<input id="coinBet" type="number" min="1" value="50">
+<label>Choose side</label>
+<select id="coinSide">
+<option value="heads">Heads</option>
+<option value="tails">Tails</option>
+</select>
+<button class="action" onclick="flipCoin()">FLIP COIN</button>
+<div id="coinResult" class="big"></div>
+</section>
 
-  <!-- ANVÄNDARPROFIL -->
-  <section id="dashboard" class="hidden">
-
-    <div class="panel">
-      <h2>Hej <span id="displayName">spelare</span>!</h2>
-      <p class="muted">Ditt virtuella saldo:</p>
-      <div class="balance">
-        <span id="balance">0</span> 🪙
-      </div>
-      <button class="secondary" onclick="loadDashboard()">
-        Uppdatera saldo
-      </button>
-      <button class="danger" onclick="signOut()">Logga ut</button>
-    </div>
-
-    <div class="panel">
-      <h2>🪙 Insättning</h2>
-      <p class="muted">
-        Skicka en förfrågan om att lägga till virtuella tokens.
-      </p>
-      <input id="depositAmount" type="number" min="1"
-        step="1" placeholder="Antal tokens">
-      <button onclick="sendRequest('deposit')">
-        Skicka insättningsförfrågan
-      </button>
-    </div>
-
-    <div class="panel">
-      <h2>💸 Uttag</h2>
-      <p class="muted">
-        Skicka en förfrågan om uttag av virtuella tokens.
-      </p>
-      <input id="withdrawAmount" type="number" min="1"
-        step="1" placeholder="Antal tokens">
-      <button onclick="sendRequest('withdraw')">
-        Skicka uttagsförfrågan
-      </button>
-    </div>
-
-    <div class="panel">
-      <h2>📋 Mina förfrågningar</h2>
-      <div id="requests">
-        Inga förfrågningar ännu.
-      </div>
-    </div>
-
-  </section>
+<section id="blackjack" class="panel">
+<h2>🃏 Blackjack</h2>
+<p>Beat the dealer without going over 21. Dealer stands on 17.</p>
+<label>Bet</label>
+<input id="bjBet" type="number" min="1" value="50">
+<label>Side bet (optional)</label>
+<input id="bjSideBet" type="number" min="0" value="0">
+<p class="muted">Side bet: your first card must match the dealer's first card in both rank and suit. Pays 10× total.</p>
+<button class="action" id="bjStart" onclick="startBJ()">DEAL</button>
+<div id="dealerArea"></div>
+<div id="playerArea"></div>
+<div id="bjActions" style="display:none">
+<button class="action" onclick="hitBJ()">HIT</button>
+<button class="action" onclick="standBJ()">STAND</button>
+<button class="action" onclick="doubleBJ()">DOUBLE DOWN</button>
+<button class="action" onclick="splitBJ()">SPLIT</button>
+</div>
+<div id="bjResult"></div>
+</section>
 </main>
 
 <footer>
-  Endast virtuella testtokens. Inga riktiga pengar eller
-  Roblox-föremål överförs.
+Tap Simulator Reborn · Virtual tokens only · No real money
 </footer>
 
 <script>
-  // SUPABASE-KOPPLING
-  const SUPABASE_URL = "https://phqyeqlqifapboesrypq.supabase.co";
+const START_BALANCE=1000;
+let balance;
+try {
+  balance=Number(localStorage.getItem("tsr_balance"));
+  if(!Number.isSafeInteger(balance)||balance<0) balance=START_BALANCE;
+} catch(e) {
+  balance=START_BALANCE;
+}
 
-  const SUPABASE_KEY = "sb_publishable_-_tdVIMnO-1W7yhuOywpCA_77CZ-6s1";
+function save(){
+  try{localStorage.setItem("tsr_balance",String(balance))}catch(e){}
+  document.getElementById("balance").textContent=balance.toLocaleString("sv-SE");
+}
+function say(text,type=""){
+  const el=document.getElementById("message");
+  el.textContent=text;
+  el.className=type;
+}
+function validBet(value,min=1){
+  const n=Number(value);
+  return Number.isSafeInteger(n)&&n>=min&&n<=balance?n:0;
+}
+function showGame(id,button){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  button.classList.add("active");
+  say("");
+}
+save();
 
-  const db = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+// TAP
+let taps=0;
+function tap(){
+  if(balance>=Number.MAX_SAFE_INTEGER-1)return say("Balance limit reached.","bad");
+  balance++;
+  taps++;
+  document.getElementById("tapCount").textContent=taps;
+  save();
+  say("+1 token!","good");
+}
 
-  let currentUser = null;
-
-  function showMessage(message) {
-    const box = document.getElementById("message");
-    box.textContent = message;
-    box.style.display = "block";
+// MINES
+let minesGame=null;
+function startMines(){
+  if(minesGame&&!minesGame.done)return say("Finish your current Mines game first.","bad");
+  const bet=validBet(document.getElementById("mineBet").value);
+  const count=Number(document.getElementById("mineCount").value);
+  if(!bet)return say("Invalid bet or not enough tokens.","bad");
+  balance-=bet;
+  const positions=Array.from({length:25},(_,i)=>i);
+  for(let i=positions.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [positions[i],positions[j]]=[positions[j],positions[i]];
   }
-
-  function hideMessage() {
-    document.getElementById("message").style.display = "none";
+  minesGame={bet,count,bombs:new Set(positions.slice(0,count)),revealed:new Set(),done:false};
+  save();
+  drawMines();
+  say("Game started. Find safe tiles!","good");
+}
+function drawMines(revealAll=false){
+  const grid=document.getElementById("mineGrid");
+  grid.innerHTML="";
+  if(!minesGame)return;
+  for(let i=0;i<25;i++){
+    const b=document.createElement("button");
+    b.className="mineCell";
+    const isBomb=minesGame.bombs.has(i);
+    const open=minesGame.revealed.has(i)||revealAll;
+    b.textContent=open?(isBomb?"💣":"💎"):"?";
+    if(open)b.classList.add(isBomb?"bomb":"revealed");
+    b.disabled=open||minesGame.done;
+    b.onclick=()=>revealMine(i);
+    grid.appendChild(b);
   }
-
-  function showDashboard(show) {
-    document.getElementById("authSection").classList.toggle("hidden", show);
-    document.getElementById("dashboard").classList.toggle("hidden", !show);
+  const k=minesGame.revealed.size;
+  let probability=1;
+  for(let i=0;i<k;i++)probability*=((25-minesGame.count-i)/(25-i));
+  const mult=k?0.8/probability:0;
+  document.getElementById("mineInfo").textContent=
+    "Safe tiles: "+k+" · Cashout multiplier: "+mult.toFixed(2)+"× · Bet: "+minesGame.bet;
+}
+function revealMine(i){
+  if(!minesGame||minesGame.done||minesGame.revealed.has(i))return;
+  minesGame.revealed.add(i);
+  if(minesGame.bombs.has(i)){
+    minesGame.done=true;
+    drawMines(true);
+    document.getElementById("mineInfo").textContent="BOOM! You lost "+minesGame.bet+" tokens.";
+    say("💥 You hit a mine!","bad");
+    return;
   }
+  drawMines();
+  say("Safe! You can keep playing or cash out.","good");
+}
+function cashoutMines(){
+  if(!minesGame||minesGame.done||minesGame.revealed.size===0)return say("Reveal a safe tile first.","bad");
+  let probability=1;
+  const k=minesGame.revealed.size;
+  for(let i=0;i<k;i++)probability*=((25-minesGame.count-i)/(25-i));
+  const payout=Math.floor(minesGame.bet*0.8/probability);
+  minesGame.done=true;
+  balance+=payout;
+  drawMines();
+  document.getElementById("mineInfo").textContent="Cashed out: "+payout+" tokens.";
+  save();
+  say("You cashed out "+payout+" tokens!","good");
+}
 
-  async function signUp() {
-    hideMessage();
-
-    const username = document.getElementById("username").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-
-    if (!username || !email || password.length < 6) {
-      showMessage("Fyll i användarnamn, e-post och lösenord (minst 6 tecken).");
-      return;
-    }
-
-    const { data, error } = await db.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { username }
-      }
-    });
-
-    if (error) {
-      showMessage(error.message);
-      return;
-    }
-
-    if (!data.session) {
-      showMessage("Kontot är skapat! Kontrollera din e-post för att bekräfta kontot och logga sedan in.");
-      return;
-    }
-
-    currentUser = data.user;
-    await loadDashboard();
+// COIN FLIP
+function flipCoin(){
+  const bet=validBet(document.getElementById("coinBet").value);
+  if(!bet)return say("Invalid bet or not enough tokens.","bad");
+  balance-=bet;
+  const chosen=document.getElementById("coinSide").value;
+  const won=Math.random()<0.4;
+  const result=won?chosen:(chosen==="heads"?"tails":"heads");
+  document.getElementById("coinResult").textContent=result==="heads"?"🪙 HEADS":"🪙 TAILS";
+  if(won){
+    balance+=bet*2;
+    say("You won! +"+bet+" net tokens.","good");
+  }else{
+    say("You lost "+bet+" tokens.","bad");
   }
+  save();
+}
 
-  async function signIn() {
-    hideMessage();
-
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-
-    const { data, error } = await db.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (error) {
-      showMessage(error.message);
-      return;
-    }
-
-    currentUser = data.user;
-    await loadDashboard();
+// BLACKJACK
+const suits=["♠","♥","♦","♣"];
+const ranks=["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+let bj=null;
+function newDeck(){
+  const d=[];
+  for(const s of suits)for(const r of ranks)d.push({s,r});
+  for(let i=d.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [d[i],d[j]]=[d[j],d[i]];
   }
-
-  async function signOut() {
-    await db.auth.signOut();
-    currentUser = null;
-    showDashboard(false);
-    showMessage("Du har loggats ut.");
+  return d;
+}
+function drawCard(){return bj.deck.pop()}
+function total(hand){
+  let n=0,a=0;
+  for(const c of hand){
+    if(c.r==="A"){n+=11;a++}
+    else if(["K","Q","J"].includes(c.r))n+=10;
+    else n+=Number(c.r);
   }
+  while(n>21&&a){n-=10;a--}
+  return n;
+}
+function cardHTML(c){
+  const red=c.s==="♥"||c.s==="♦";
+  return '<span class="card '+(red?"red":"")+'">'+c.r+c.s+'</span>';
+}
+function startBJ(){
+  if(bj&&!bj.done)return say("Finish your current Blackjack game first.","bad");
+  const bet=validBet(document.getElementById("bjBet").value);
+  const side=Number(document.getElementById("bjSideBet").value);
+  if(!bet||!Number.isSafeInteger(side)||side<0||bet+side>balance)
+    return say("Invalid bet or not enough tokens.","bad");
+  balance-=bet+side;
+  bj={deck:newDeck(),dealer:[],hands:[{cards:[],bet,done:false,split:false}],current:0,side,done:false};
+  bj.hands[0].cards.push(drawCard());
+  bj.dealer.push(drawCard());
+  bj.hands[0].cards.push(drawCard());
+  bj.dealer.push(drawCard());
 
-  async function loadDashboard() {
-    if (!currentUser) return;
-
-    hideMessage();
-
-    const { data: profile, error } = await db
-      .from("profiles")
-      .select("username, balance")
-      .eq("id", currentUser.id)
-      .single();
-
-    if (error) {
-      showMessage("Kunde inte hämta profilen: " + error.message);
-      return;
-    }
-
-    document.getElementById("displayName").textContent =
-      profile.username || "spelare";
-
-    document.getElementById("balance").textContent =
-      Number(profile.balance).toLocaleString("sv-SE");
-
-    showDashboard(true);
-    await loadRequests();
+  let sideWin=false;
+  if(side>0){
+    const p=bj.hands[0].cards[0],d=bj.dealer[0];
+    sideWin=p.r===d.r&&p.s===d.s;
+    if(sideWin)balance+=side*10;
   }
+  save();
+  document.getElementById("bjResult").textContent=side?(sideWin?"🎉 Perfect match! Side bet paid 10×!":"Side bet lost."):"";
+  document.getElementById("bjStart").disabled=true;
+  document.getElementById("bjActions").style.display="block";
 
-  async function sendRequest(type) {
-    hideMessage();
-
-    const field = type === "deposit"
-      ? document.getElementById("depositAmount")
-      : document.getElementById("withdrawAmount");
-
-    const amount = Number(field.value);
-
-    if (!Number.isSafeInteger(amount) || amount <= 0) {
-      showMessage("Skriv ett giltigt antal tokens.");
-      return;
+  if(total(bj.hands[0].cards)===21)bj.hands[0].done=true;
+  renderBJ();
+  advanceBJ();
+}
+function renderBJ(){
+  if(!bj)return;
+  document.getElementById("dealerArea").innerHTML=
+    "<h3>Dealer</h3><div class='cards'>"+
+    (bj.done?bj.dealer.map(cardHTML).join(""):cardHTML(bj.dealer[0])+"<span class='card'>?</span>")+
+    "</div>"+(bj.done?"Total: "+total(bj.dealer):"");
+  document.getElementById("playerArea").innerHTML="<h3>Your hands</h3>"+
+    bj.hands.map((h,i)=>"<div class='hand'><b>Hand "+(i+1)+(i===bj.current&&!bj.done?" · YOUR TURN":"")+"</b><div class='cards'>"+
+    h.cards.map(cardHTML).join("")+"</div>Total: "+total(h.cards)+" · Bet: "+h.bet+"</div>").join("");
+}
+function advanceBJ(){
+  if(!bj||bj.done)return;
+  while(bj.current<bj.hands.length&&bj.hands[bj.current].done)bj.current++;
+  if(bj.current>=bj.hands.length)finishBJ();
+  else renderBJ();
+}
+function hitBJ(){
+  if(!bj||bj.done)return;
+  const h=bj.hands[bj.current];
+  h.cards.push(drawCard());
+  if(total(h.cards)>=21)h.done=true;
+  advanceBJ();
+}
+function standBJ(){
+  if(!bj||bj.done)return;
+  bj.hands[bj.current].done=true;
+  bj.current++;
+  advanceBJ();
+}
+function doubleBJ(){
+  if(!bj||bj.done)return;
+  const h=bj.hands[bj.current];
+  if(h.cards.length!==2)return say("Double Down is only available on your first two cards.","bad");
+  if(balance<h.bet)return say("Not enough tokens to double.","bad");
+  balance-=h.bet;
+  h.bet*=2;
+  h.cards.push(drawCard());
+  h.done=true;
+  save();
+  bj.current++;
+  advanceBJ();
+}
+function splitBJ(){
+  if(!bj||bj.done)return;
+  const h=bj.hands[bj.current];
+  if(h.cards.length!==2||h.cards[0].r!==h.cards[1].r)
+    return say("You need a matching pair to split.","bad");
+  if(bj.hands.length>=3)return say("Maximum 3 hands.","bad");
+  if(balance<h.bet)return say("Not enough tokens to split.","bad");
+  balance-=h.bet;
+  const second=h.cards.pop();
+  const next={cards:[second],bet:h.bet,done:false,split:true};
+  h.split=true;
+  h.cards.push(drawCard());
+  next.cards.push(drawCard());
+  if(total(h.cards)>=21)h.done=true;
+  if(total(next.cards)>=21)next.done=true;
+  bj.hands.splice(bj.current+1,0,next);
+  save();
+  advanceBJ();
+}
+function finishBJ(){
+  if(!bj||bj.done)return;
+  while(total(bj.dealer)<17)bj.dealer.push(drawCard());
+  const dt=total(bj.dealer);
+  let paid=0,summary=[];
+  for(const h of bj.hands){
+    const pt=total(h.cards);
+    let p=0,result="LOSE";
+    const natural=!h.split&&h.cards.length===2&&pt===21;
+    const dealerNatural=bj.dealer.length===2&&dt===21;
+    if(pt<=21){
+      if(natural&&dealerNatural){p=h.bet;result="PUSH"}
+      else if(natural){p=Math.floor(h.bet*2.5);result="BLACKJACK"}
+      else if(dt>21||pt>dt){p=h.bet*2;result="WIN"}
+      else if(pt===dt){p=h.bet;result="PUSH"}
     }
-
-    if (type === "withdraw") {
-      const currentBalance = Number(
-        document.getElementById("balance").textContent.replace(/\s/g, "")
-      );
-
-      if (amount > currentBalance) {
-        showMessage("Du har inte tillräckligt med tokens för den förfrågan.");
-        return;
-      }
-    }
-
-    const { error } = await db
-      .from("token_requests")
-      .insert({
-        user_id: currentUser.id,
-        request_type: type,
-        amount: amount
-      });
-
-    if (error) {
-      showMessage("Kunde inte skicka förfrågan: " + error.message);
-      return;
-    }
-
-    field.value = "";
-    showMessage("Din förfrågan har skickats!");
-    await loadRequests();
+    paid+=p;
+    summary.push(result+" ("+p+")");
   }
-
-  async function loadRequests() {
-    const { data, error } = await db
-      .from("token_requests")
-      .select("request_type, amount, status, created_at")
-      .eq("user_id", currentUser.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      document.getElementById("requests").textContent =
-        "Kunde inte hämta förfrågningarna.";
-      return;
-    }
-
-    const container = document.getElementById("requests");
-    container.replaceChildren();
-
-    if (!data || data.length === 0) {
-      container.textContent = "Inga förfrågningar ännu.";
-      return;
-    }
-
-    data.forEach(request => {
-      const item = document.createElement("div");
-      item.className = "request";
-
-      const type = request.request_type === "deposit"
-        ? "Insättning"
-        : "Uttag";
-
-      const status = {
-        pending: "Väntar",
-        approved: "Godkänd",
-        rejected: "Avslagen"
-      }[request.status] || request.status;
-
-      item.textContent =
-        type + " – " + request.amount +
-        " tokens – " + status;
-
-      container.appendChild(item);
-    });
-  }
-
-  // Kontrollera om användaren redan är inloggad
-  db.auth.onAuthStateChange((event, session) => {
-    currentUser = session?.user || null;
-
-    if (currentUser) {
-      setTimeout(() => loadDashboard(), 0);
-    } else {
-      showDashboard(false);
-    }
-  });
-
-  async function checkSession() {
-    const { data } = await db.auth.getSession();
-    currentUser = data.session?.user || null;
-
-    if (currentUser) {
-      await loadDashboard();
-    }
-  }
-
-  checkSession();
+  balance+=paid;
+  bj.done=true;
+  save();
+  document.getElementById("bjActions").style.display="none";
+  document.getElementById("bjStart").disabled=false;
+  document.getElementById("bjResult").textContent=
+    "Dealer: "+dt+" · "+summary.join(" | ")+" · Total payout: "+paid+" tokens";
+  renderBJ();
+  say("Round finished!","good");
+}
 </script>
-<h2>🃏 Blackjack</h2>
-  <button onclick="alert('Blackjack kommer snart!')">Spela Blackjack</button>
 </body>
 </html>
-
