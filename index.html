@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -41,29 +40,50 @@ h2{color:#f2d28a;margin-top:0}
 .mineCell{aspect-ratio:1;background:linear-gradient(145deg,#493278,#21152f);font-size:clamp(18px,4vw,27px);padding:3px;border:1px solid #7653a2}
 .mineCell.revealed{background:#087c59}
 .mineCell.bomb{background:#a51e48}
-.casino-table{position:relative;overflow:hidden;background:radial-gradient(ellipse at center,#11704b,#06432e 60%,#02261b);border:8px solid #a87831;border-radius:48% / 12%;padding:18px 12px 25px;min-height:560px;box-shadow:inset 0 0 45px #00170f,0 0 25px #9c53ef55}
-.dealer{text-align:center;margin:0 auto 12px}
-.avatar{width:112px;height:112px;border-radius:50%;margin:auto;background:linear-gradient(145deg,#ffe0c0,#9e6147);border:4px solid var(--gold);display:grid;place-items:center;font-size:70px;box-shadow:0 0 25px #e8b95b88}
+.casino-table{position:relative;isolation:isolate;overflow:hidden;background:
+ radial-gradient(ellipse at 50% 42%,#16845a 0%,#09603f 48%,#03432e 76%,#02291e 100%);
+ border:13px solid #7c4a1d;border-radius:48% / 15%;padding:22px 18px 30px;min-height:690px;
+ box-shadow:inset 0 0 0 4px #e5bd68,inset 0 0 0 8px #4a2b16,inset 0 0 65px #00170f,0 12px 28px #0009,0 0 25px #9c53ef55}
+.casino-table:before{content:"";position:absolute;inset:14px;border:2px solid #d8b66b99;border-radius:48% / 15%;pointer-events:none;z-index:-1}
+.casino-table:after{content:"♠   ♥   ♦   ♣";position:absolute;left:0;right:0;top:48%;text-align:center;color:#e8d19a18;font-size:clamp(30px,6vw,64px);letter-spacing:clamp(12px,4vw,38px);pointer-events:none;z-index:-1}
+.tabletitle{display:inline-block;position:relative;left:50%;transform:translateX(-50%);background:#062e21aa;border:1px solid #d5b56b88;border-radius:30px;padding:8px 24px;white-space:nowrap;text-shadow:0 2px 4px #000;margin:15px auto 18px}
+.tablearea{max-width:700px;margin:14px auto;background:linear-gradient(145deg,#003b29bb,#002719bb);border:2px solid #c9a45b88;border-radius:22px;padding:14px;text-align:center;box-shadow:inset 0 0 18px #00170d88,0 5px 12px #00170d66}
+#dealerArea{max-width:620px;border-radius:50% / 24%;min-height:112px}
+#playerArea{max-width:740px;background:linear-gradient(145deg,#064b34dd,#002719dd);border:2px solid #e4c16d;box-shadow:inset 0 0 22px #00170d99,0 0 16px #e7bd5b33}
+.table-center{position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;margin:12px auto 15px;min-height:65px}
+.table-center-label{font-size:11px;letter-spacing:4px;color:#f4d68f;text-shadow:0 2px 4px #000;font-weight:bold}
+.chips{display:inline-block;text-align:center;font-size:35px;margin:0;padding:5px 22px;border:1px dashed #e7c77799;border-radius:40px;background:#00291d88;box-shadow:0 3px 9px #00170d77}
+.dealer{text-align:center;margin:0 auto 12px;position:relative;z-index:2}
+.avatar{width:112px;height:112px;border-radius:50%;margin:auto;background:linear-gradient(145deg,#ffe0c0,#9e6147);border:4px solid var(--gold);display:grid;place-items:center;font-size:70px;box-shadow:0 0 25px #e8b95b88;animation:avatarFloat 3s ease-in-out infinite;transition:transform .25s}
+.dealer.dealing .avatar{animation:dealerDeal .55s ease-in-out 2}
 .dealername{color:#ffe09a;font-weight:bold;letter-spacing:3px;margin:8px}
 .tabletitle{text-align:center;color:#f2d28a;letter-spacing:3px;font-weight:bold;margin:16px}
-.tablearea{max-width:700px;margin:12px auto;background:#00271977;border:1px solid #c7a45c66;border-radius:15px;padding:13px;text-align:center}
+.tablearea{max-width:700px;margin:12px auto;background:#00271977;border:1px solid #c7a45c66;border-radius:15px;padding:13px;text-align:center;position:relative;z-index:1}
 .tablearea h3{color:#f5d58d;margin:4px}
 .cards{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;min-height:75px;margin:10px}
-.card{background:linear-gradient(135deg,#fff,#e5e1db);color:#171717;border-radius:8px;width:52px;height:73px;display:grid;place-items:center;font-size:23px;font-weight:bold;border:2px solid #ddd;box-shadow:0 4px 9px #0008;animation:deal .28s ease-out}
+.card{background:linear-gradient(135deg,#fff,#e5e1db);color:#171717;border-radius:8px;width:52px;height:73px;display:grid;place-items:center;font-size:23px;font-weight:bold;border:2px solid #ddd;box-shadow:0 4px 9px #0008;animation:deal .48s cubic-bezier(.2,.8,.2,1) both}
 .card.red{color:#d21f3c}
 .card.back{background:repeating-linear-gradient(45deg,#9a173c,#9a173c 5px,#eee 6px,#9a173c 8px);color:white}
-@keyframes deal{from{transform:translateY(-24px) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
-.chips{text-align:center;font-size:35px;margin:9px}
-.bjcontrols{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:15px auto}
+@keyframes deal{from{transform:translate(-70px,-95px) rotate(-35deg) scale(.55);opacity:0}to{transform:translate(0,0) rotate(0) scale(1);opacity:1}}
+@keyframes avatarFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes dealerDeal{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-9deg) translateY(-8px)}70%{transform:rotate(8deg) translateY(-3px)}}
+.chips{text-align:center;font-size:35px;margin:9px;position:relative;z-index:1}
+.bjcontrols{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:15px auto;position:relative;z-index:1}
 .bjcontrols button{min-width:105px;padding:17px}
-.betbox{max-width:350px;margin:15px auto;background:#082c21;border:1px solid #b88a40;padding:14px;border-radius:12px}
-#bjResult{text-align:center;color:#ffe39a;font-weight:bold;margin:15px}
+.betbox{max-width:390px;margin:18px auto 4px;background:linear-gradient(145deg,#103d2d,#082719);border:2px solid #c49a4d;padding:16px;border-radius:16px;box-shadow:0 6px 18px #00170d88;position:relative;z-index:1}
+#bjResult{text-align:center;color:#ffe39a;font-weight:bold;margin:15px;position:relative;z-index:1}
 .hand{padding:10px;border:1px solid #e0bf6b66;border-radius:12px;margin:8px}
 .hand.current{border:2px solid #ffe08c;box-shadow:0 0 12px #ffe08c44}
 .coin{font-size:90px;text-align:center;margin:20px;animation:spin .8s}
 @keyframes spin{from{transform:rotateY(0)}to{transform:rotateY(720deg)}}
+#fxLayer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5}
+.flying-chip{position:absolute;font-size:29px;left:50%;top:55%;animation:chipFly .8s ease-out forwards;filter:drop-shadow(0 3px 4px #0008)}
+@keyframes chipFly{0%{transform:translate(-50%,20px) scale(.4) rotate(0);opacity:0}20%{opacity:1}100%{transform:translate(var(--x),-180px) scale(1.15) rotate(300deg);opacity:0}}
+.confetti{position:absolute;top:-18px;width:9px;height:15px;border-radius:2px;animation:confettiFall var(--duration) linear forwards;opacity:.95}
+@keyframes confettiFall{to{transform:translate(var(--drift),620px) rotate(900deg);opacity:.1}}
 footer{text-align:center;color:#8c7d9f;padding:20px;font-size:12px}
-@media(max-width:700px){.layout{grid-template-columns:1fr;padding:10px}nav{display:grid;grid-template-columns:repeat(2,1fr)}nav button{text-align:center;padding:13px 5px;font-size:14px}.panel{padding:13px}.casino-table{border-radius:35px;min-height:500px}.avatar{width:90px;height:90px;font-size:56px}}
+@media(max-width:700px){.layout{grid-template-columns:1fr;padding:10px}nav{display:grid;grid-template-columns:repeat(2,1fr)}nav button{text-align:center;padding:13px 5px;font-size:14px}.panel{padding:13px}.casino-table{border-radius:30px;min-height:610px;padding:15px 8px 22px;border-width:9px}.casino-table:before{inset:8px}.avatar{width:90px;height:90px;font-size:56px}.tabletitle{font-size:12px;letter-spacing:2px;padding:7px 13px}.tablearea{padding:10px 6px}.card{width:46px;height:66px;font-size:20px}.chips{font-size:29px;padding:4px 14px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
@@ -121,14 +141,18 @@ footer{text-align:center;color:#8c7d9f;padding:20px;font-size:12px}
 <h2>♠ ROYAL BLACKJACK</h2>
 <p class="muted">Welcome to the table. Good luck!</p>
 <div class="casino-table">
-<div class="dealer">
+<div id="fxLayer"></div>
+<div class="dealer" id="dealer">
 <div class="avatar">👩🏻‍💼</div>
 <div class="dealername">YOUR DEALER</div>
 <div class="muted">Dealer stands on 17</div>
 </div>
 <div class="tabletitle">♠ ROYAL BLACKJACK ♠</div>
 <div id="dealerArea" class="tablearea"><h3>DEALER</h3><p>Waiting for cards...</p></div>
-<div class="chips">🔴 ⚫ 🟣 🔵</div>
+<div class="table-center">
+ <div class="table-center-label">BETTING AREA · PLACE YOUR BET</div>
+ <div class="chips">🔴 ⚫ 🟣 🔵</div>
+</div>
 <div id="playerArea" class="tablearea"><h3>YOUR HAND</h3><p>Place your bet and deal!</p></div>
 <div class="betbox">
 <label>Your bet</label><input id="bjBet" type="number" min="1" value="50">
@@ -158,6 +182,51 @@ function msg(t){document.getElementById("message").textContent=t}
 function betValue(id,min=1){let n=Number(document.getElementById(id).value);return Number.isSafeInteger(n)&&n>=min&&n<=balance?n:0}
 function show(id,b){document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");msg("")}
 save();
+
+// SOUND: små syntetiska ljudeffekter som skapas direkt i webbläsaren
+let audioCtx=null;
+function playSound(kind){
+ try{
+  const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+  if(!AudioContextClass)return;
+  if(!audioCtx)audioCtx=new AudioContextClass();
+  if(audioCtx.state==="suspended")audioCtx.resume();
+  const now=audioCtx.currentTime;
+  const notes=kind==="win"?[523,659,784,1046]:kind==="lose"?[260,190]:kind==="chip"?[740,980]:kind==="deal"?[420,330]:[600];
+  notes.forEach((freq,i)=>{
+   const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+   osc.type=kind==="deal"?"triangle":"sine";
+   osc.frequency.setValueAtTime(freq,now+i*.075);
+   gain.gain.setValueAtTime(.0001,now+i*.075);
+   gain.gain.exponentialRampToValueAtTime(kind==="deal"?.045:.065,now+i*.075+.012);
+   gain.gain.exponentialRampToValueAtTime(.0001,now+i*.075+.13);
+   osc.connect(gain);gain.connect(audioCtx.destination);
+   osc.start(now+i*.075);osc.stop(now+i*.075+.15);
+  });
+ }catch(e){}
+}
+function animateChips(){
+ const layer=document.getElementById("fxLayer");
+ ["🔴","🟡","🟣","🔵","⚫"].forEach((chip,i)=>{
+  const el=document.createElement("span");el.className="flying-chip";el.textContent=chip;
+  el.style.setProperty("--x",((i-2)*48)+"px");el.style.animationDelay=(i*.055)+"s";
+  layer.appendChild(el);setTimeout(()=>el.remove(),1100);
+ });
+ playSound("chip");
+}
+function showConfetti(){
+ const layer=document.getElementById("fxLayer");
+ const pieces=["🎉","✨","🟡","🟣","🔴","💎"];
+ for(let i=0;i<65;i++){
+  const el=document.createElement("span");el.className="confetti";
+  el.textContent=pieces[Math.floor(Math.random()*pieces.length)];
+  el.style.left=(Math.random()*100)+"%";
+  el.style.setProperty("--drift",((Math.random()-.5)*180)+"px");
+  el.style.setProperty("--duration",(1.7+Math.random()*1.8)+"s");
+  el.style.animationDelay=(Math.random()*.45)+"s";
+  layer.appendChild(el);setTimeout(()=>el.remove(),4500);
+ }
+}
 
 // TAP
 let taps=0;
@@ -209,7 +278,7 @@ function flipCoin(){
  let visual=document.getElementById("coinVisual");visual.classList.remove("coin");void visual.offsetWidth;visual.classList.add("coin");
  visual.textContent=result==="heads"?"👑":"🪙";
  document.getElementById("coinResult").textContent=result.toUpperCase();
- if(win){balance+=bet*2;msg("You won! +"+bet+" net tokens.")}else msg("You lost "+bet+" tokens.");
+ if(win){balance+=bet*2;msg("You won! +"+bet+" net tokens.");playSound("win")}else{msg("You lost "+bet+" tokens.");playSound("lose")}
  save();
 }
 
@@ -226,7 +295,7 @@ function total(cards){
  let n=0,a=0;for(let c of cards){if(c.r==="A"){n+=11;a++}else if(["K","Q","J"].includes(c.r))n+=10;else n+=Number(c.r)}
  while(n>21&&a){n-=10;a--}return n;
 }
-function cardHTML(c){let red=c.s==="♥"||c.s==="♦";return '<span class="card '+(red?"red":"")+'">'+c.r+c.s+'</span>'}
+function cardHTML(c,i=0){let red=c.s==="♥"||c.s==="♦";return '<span class="card '+(red?"red":"")+'" style="animation-delay:'+(Math.min(i,5)*.09)+'s">'+c.r+c.s+'</span>'}
 function startBJ(){
  if(bj&&!bj.done)return msg("Finish your current hand first.");
  let bet=betValue("bjBet"),side=Number(document.getElementById("bjSideBet").value);
@@ -239,6 +308,9 @@ function startBJ(){
  document.getElementById("bjResult").textContent=side?(sideWin?"🎉 PERFECT PAIR! Side bet paid 10×!":"Side bet lost."):"";
  document.getElementById("bjStart").disabled=true;
  document.getElementById("bjActions").style.display="flex";
+ document.getElementById("dealer").classList.add("dealing");
+ setTimeout(()=>document.getElementById("dealer").classList.remove("dealing"),1100);
+ animateChips();playSound("deal");
  if(total(h.cards)===21)h.done=true;
  save();renderBJ();advanceBJ();
 }
@@ -256,19 +328,20 @@ function advanceBJ(){
 function hitBJ(){
  if(!bj||bj.done)return;
  let h=bj.hands[bj.current];h.cards.push(draw());
+ playSound("deal");
  if(total(h.cards)>=21)h.done=true;
  advanceBJ();
 }
 function standBJ(){
  if(!bj||bj.done)return;
- bj.hands[bj.current].done=true;bj.current++;advanceBJ();
+ playSound("deal");bj.hands[bj.current].done=true;bj.current++;advanceBJ();
 }
 function doubleBJ(){
  if(!bj||bj.done)return;
  let h=bj.hands[bj.current];
  if(h.cards.length!==2)return msg("Double Down only works on your first two cards.");
  if(balance<h.bet)return msg("Not enough tokens to double.");
- balance-=h.bet;h.bet*=2;h.cards.push(draw());h.done=true;save();bj.current++;advanceBJ();
+ balance-=h.bet;h.bet*=2;h.cards.push(draw());playSound("deal");h.done=true;save();bj.current++;advanceBJ();
 }
 function splitBJ(){
  if(!bj||bj.done)return;
@@ -279,7 +352,7 @@ function splitBJ(){
  balance-=h.bet;
  let second=h.cards.pop();
  let next={cards:[second,draw()],bet:h.bet,done:false,split:true};
- h.split=true;h.cards.push(draw());
+ h.split=true;h.cards.push(draw());playSound("deal");
  if(total(h.cards)>=21)h.done=true;
  if(total(next.cards)>=21)next.done=true;
  bj.hands.splice(bj.current+1,0,next);save();advanceBJ();
@@ -287,7 +360,6 @@ function splitBJ(){
 function finishBJ(){
  if(!bj||bj.done)return;
  let dealerTotal=total(bj.dealer);
- // Dealer draws unless all player hands have busted
  if(bj.hands.some(h=>total(h.cards)<=21)){
   while(total(bj.dealer)<17)bj.dealer.push(draw());
  }
@@ -309,10 +381,11 @@ function finishBJ(){
  document.getElementById("bjActions").style.display="none";
  document.getElementById("bjStart").disabled=false;
  document.getElementById("bjResult").textContent=summary.join(" · ")+" · Payout: "+paid+" tokens";
- renderBJ();msg("Blackjack round finished!");
+ renderBJ();
+ if(summary.some(x=>x.includes("WIN")||x.includes("BLACKJACK"))){showConfetti();playSound("win");msg("🎉 You won! Blackjack round finished!")}
+ else if(summary.every(x=>x.includes("PUSH"))){playSound("deal");msg("Round finished — push!")}
+ else{playSound("lose");msg("Blackjack round finished!")}
 }
 </script>
 </body>
 </html>
-
-
