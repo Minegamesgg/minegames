@@ -1,408 +1,317 @@
 
-
 <!DOCTYPE html>
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Tap Simulator Reborn</title>
 <style>
+:root{--gold:#f4c76a;--purple:#a855f7;--bg:#090713;--panel:#171126;--green:#075638}
 *{box-sizing:border-box}
-body{margin:0;background:#0b1020;color:#fff;font-family:Arial,sans-serif}
-header{padding:22px;text-align:center;background:#121b32;border-bottom:1px solid #293858}
-header h1{margin:0;color:#8e9dff;font-size:30px}
-header p{color:#9eaccb}
-.wallet{background:#192747;padding:16px;border-radius:15px;margin:15px auto;max-width:300px}
-.wallet strong{font-size:26px;color:#66f0d0}
-main{max-width:850px;margin:auto;padding:16px}
-nav{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-button{border:0;border-radius:12px;padding:13px;font-size:15px;font-weight:bold;cursor:pointer;background:#293b65;color:white}
-button:hover{filter:brightness(1.2)}
-nav button{background:#182849;padding:20px 8px;border:1px solid #344b7b}
-nav button.active{background:#5555c9}
-.panel{display:none;margin-top:18px;background:#131e37;padding:20px;border-radius:17px;border:1px solid #293858}
+body{margin:0;background:radial-gradient(ellipse at top,#281344,#090713 65%);color:#fff;font-family:Arial,sans-serif;min-height:100vh}
+button{cursor:pointer;border:0;font-weight:bold;color:white;border-radius:12px;padding:13px 17px;transition:.2s}
+button:hover{filter:brightness(1.2);transform:translateY(-2px)}
+button:disabled{opacity:.35;cursor:not-allowed;transform:none}
+input,select{background:#0b0915;color:white;border:1px solid #65517d;border-radius:9px;padding:12px;width:100%;margin:6px 0 13px}
+header{padding:18px 22px;background:#100b1c;border-bottom:1px solid #53347b;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-size:clamp(21px,4vw,32px);font-weight:1000;font-style:italic;color:#e6c1ff;text-shadow:0 0 15px #a855f7}
+.logo span{color:var(--gold)}
+.wallet{background:#090713;border:1px solid var(--gold);border-radius:14px;padding:10px 17px;text-align:center;min-width:150px;box-shadow:0 0 15px #e5b94b33}
+.wallet small{display:block;color:#c9b7db}
+.wallet strong{font-size:25px;color:var(--gold)}
+.layout{max-width:1250px;margin:auto;padding:18px;display:grid;grid-template-columns:170px 1fr;gap:18px}
+nav{display:flex;flex-direction:column;gap:10px}
+nav button{background:#1b122c;border:1px solid #49305f;text-align:left;font-size:16px;padding:17px}
+nav button.active{background:linear-gradient(100deg,#7540b4,#321c58);border-color:#e5bd68;box-shadow:0 0 15px #a855f755}
+main{min-width:0}
+.panel{display:none;background:#171126;border:1px solid #49305f;border-radius:18px;padding:22px;min-height:480px;box-shadow:0 10px 35px #0005}
 .panel.active{display:block}
-h2{color:#a5b3ff;margin-top:0}
-input,select{padding:12px;border-radius:9px;border:1px solid #465b83;background:#0b1429;color:white;width:100%;margin:7px 0 13px}
-.action{background:#635be9;margin:5px 3px}
-.good{color:#65e8bb}
-.bad{color:#ff7777}
-.muted{color:#a8b5d0}
-.big{font-size:28px;font-weight:bold}
-#mineGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:16px 0}
-.mineCell{aspect-ratio:1;background:#293b65;font-size:23px;padding:5px}
-.mineCell.revealed{background:#246c65}
-.mineCell.bomb{background:#a33b50}
-.cards{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;min-height:75px}
-.card{background:#fff;color:#171717;border-radius:9px;padding:12px 9px;font-size:22px;min-width:48px;text-align:center;font-weight:bold}
-.red{color:#d22}
-.hand{background:#1b2a4b;padding:12px;border-radius:12px;margin:12px 0}
-footer{text-align:center;color:#7484a6;padding:25px;font-size:12px}
-#message{min-height:25px;margin:12px 0;font-weight:bold}
+h2{color:#f2d28a;margin-top:0}
+.muted{color:#b6a7c9}
+.action{background:linear-gradient(135deg,#8248cb,#4c2784);margin:4px}
+.gold{background:linear-gradient(135deg,#dba83c,#86520e);color:#180e05}
+.green{background:linear-gradient(135deg,#13a66b,#075638)}
+.redbtn{background:linear-gradient(135deg,#d94a54,#7b1424)}
+.bluebtn{background:linear-gradient(135deg,#477eea,#263e9a)}
+.big{font-size:32px;font-weight:bold}
+#message{min-height:25px;padding:8px;color:#ffe29a;font-weight:bold}
+.gamebox{background:#100c1c;border:1px solid #4a3261;border-radius:14px;padding:17px;margin:12px 0}
+.tapbutton{width:100%;padding:35px;font-size:32px;background:radial-gradient(circle,#358cff,#2825a2);box-shadow:0 0 25px #408bff88}
+#mineGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:430px;margin:18px auto}
+.mineCell{aspect-ratio:1;background:linear-gradient(145deg,#493278,#21152f);font-size:clamp(18px,4vw,27px);padding:3px;border:1px solid #7653a2}
+.mineCell.revealed{background:#087c59}
+.mineCell.bomb{background:#a51e48}
+.casino-table{position:relative;overflow:hidden;background:radial-gradient(ellipse at center,#11704b,#06432e 60%,#02261b);border:8px solid #a87831;border-radius:48% / 12%;padding:18px 12px 25px;min-height:560px;box-shadow:inset 0 0 45px #00170f,0 0 25px #9c53ef55}
+.dealer{text-align:center;margin:0 auto 12px}
+.avatar{width:112px;height:112px;border-radius:50%;margin:auto;background:linear-gradient(145deg,#ffe0c0,#9e6147);border:4px solid var(--gold);display:grid;place-items:center;font-size:70px;box-shadow:0 0 25px #e8b95b88}
+.dealername{color:#ffe09a;font-weight:bold;letter-spacing:3px;margin:8px}
+.tabletitle{text-align:center;color:#f2d28a;letter-spacing:3px;font-weight:bold;margin:16px}
+.tablearea{max-width:700px;margin:12px auto;background:#00271977;border:1px solid #c7a45c66;border-radius:15px;padding:13px;text-align:center}
+.tablearea h3{color:#f5d58d;margin:4px}
+.cards{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;min-height:75px;margin:10px}
+.card{background:linear-gradient(135deg,#fff,#e5e1db);color:#171717;border-radius:8px;width:52px;height:73px;display:grid;place-items:center;font-size:23px;font-weight:bold;border:2px solid #ddd;box-shadow:0 4px 9px #0008;animation:deal .28s ease-out}
+.card.red{color:#d21f3c}
+.card.back{background:repeating-linear-gradient(45deg,#9a173c,#9a173c 5px,#eee 6px,#9a173c 8px);color:white}
+@keyframes deal{from{transform:translateY(-24px) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
+.chips{text-align:center;font-size:35px;margin:9px}
+.bjcontrols{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:15px auto}
+.bjcontrols button{min-width:105px;padding:17px}
+.betbox{max-width:350px;margin:15px auto;background:#082c21;border:1px solid #b88a40;padding:14px;border-radius:12px}
+#bjResult{text-align:center;color:#ffe39a;font-weight:bold;margin:15px}
+.hand{padding:10px;border:1px solid #e0bf6b66;border-radius:12px;margin:8px}
+.hand.current{border:2px solid #ffe08c;box-shadow:0 0 12px #ffe08c44}
+.coin{font-size:90px;text-align:center;margin:20px;animation:spin .8s}
+@keyframes spin{from{transform:rotateY(0)}to{transform:rotateY(720deg)}}
+footer{text-align:center;color:#8c7d9f;padding:20px;font-size:12px}
+@media(max-width:700px){.layout{grid-template-columns:1fr;padding:10px}nav{display:grid;grid-template-columns:repeat(2,1fr)}nav button{text-align:center;padding:13px 5px;font-size:14px}.panel{padding:13px}.casino-table{border-radius:35px;min-height:500px}.avatar{width:90px;height:90px;font-size:56px}}
 </style>
 </head>
 <body>
-
 <header>
-<h1>⚡ TAP SIMULATOR REBORN</h1>
-<p>Play. Win. Collect tokens.</p>
-<div class="wallet">
-<div class="muted">YOUR BALANCE</div>
-<strong id="balance">1 000</strong> tokens
-</div>
+ <div class="logo">♛ TAP SIMULATOR <span>REBORN</span></div>
+ <div class="wallet"><small>YOUR BALANCE</small><strong id="balance">1 000</strong> 🪙</div>
 </header>
 
-<main>
+<div class="layout">
 <nav>
-<button class="active" onclick="showGame('tap',this)">⚡ Tap</button>
-<button onclick="showGame('mines',this)">💣 Mines</button>
-<button onclick="showGame('coin',this)">🪙 Coin Flip</button>
-<button onclick="showGame('blackjack',this)">🃏 Blackjack</button>
+ <button class="active" onclick="show('tap',this)">⚡ Tap</button>
+ <button onclick="show('mines',this)">💣 Mines</button>
+ <button onclick="show('coin',this)">🪙 Coin Flip</button>
+ <button onclick="show('blackjack',this)">♠ Blackjack</button>
 </nav>
-
+<main>
 <div id="message"></div>
 
 <section id="tap" class="panel active">
-<h2>⚡ Tap Simulator</h2>
-<p>Tap the button to earn virtual tokens!</p>
-<div class="big" id="tapCount">0</div>
-<p class="muted">Total taps this session</p>
-<button class="action" style="width:100%;padding:25px;font-size:24px" onclick="tap()">TAP!</button>
+<h2>⚡ TAP SIMULATOR</h2>
+<p>Tap and collect virtual tokens!</p>
+<div class="gamebox" style="text-align:center">
+<div class="big" id="tapCount">0</div><p class="muted">TOTAL TAPS</p>
+<button class="tapbutton" onclick="tap()">⚡ TAP!</button>
+</div>
 </section>
 
 <section id="mines" class="panel">
-<h2>💣 Mines</h2>
-<p>Choose your bet and number of mines. Find safe tiles and cash out before hitting a mine!</p>
-<label>Bet</label>
-<input id="mineBet" type="number" min="1" value="50">
+<h2>💣 MINES</h2>
+<p class="muted">Find safe gems. Avoid the bombs. Cash out when you want!</p>
+<div class="gamebox">
+<label>Bet</label><input id="mineBet" type="number" min="1" value="50">
 <label>Number of mines</label>
-<select id="mineCount">
-<option value="3">3 mines</option>
-<option value="5">5 mines</option>
-<option value="8">8 mines</option>
-<option value="10">10 mines</option>
-<option value="15">15 mines</option>
-<option value="20">20 mines</option>
-</select>
-<button class="action" onclick="startMines()">Start game</button>
-<button class="action" onclick="cashoutMines()">Cash out</button>
+<select id="mineCount"><option value="3">3 mines</option><option value="5">5 mines</option><option value="8">8 mines</option><option value="10">10 mines</option><option value="15">15 mines</option><option value="20">20 mines</option></select>
+<button class="action" onclick="startMines()">START GAME</button>
+<button class="gold" onclick="cashoutMines()">CASH OUT</button>
 <div id="mineInfo" class="muted">Start a game to play.</div>
 <div id="mineGrid"></div>
+</div>
 </section>
 
 <section id="coin" class="panel">
-<h2>🪙 Coin Flip</h2>
-<p>Pick a side. Your selected side has a 40% chance of winning. The other side has a 60% chance.</p>
-<label>Bet</label>
-<input id="coinBet" type="number" min="1" value="50">
-<label>Choose side</label>
-<select id="coinSide">
-<option value="heads">Heads</option>
-<option value="tails">Tails</option>
-</select>
-<button class="action" onclick="flipCoin()">FLIP COIN</button>
+<h2>🪙 COIN FLIP</h2>
+<p class="muted">Choose heads or tails. Your chosen side has a 40% chance.</p>
+<div class="gamebox">
+<label>Bet</label><input id="coinBet" type="number" min="1" value="50">
+<label>Choose side</label><select id="coinSide"><option value="heads">Heads</option><option value="tails">Tails</option></select>
+<button class="gold" onclick="flipCoin()">FLIP COIN</button>
+<div id="coinVisual" class="coin">🪙</div>
 <div id="coinResult" class="big"></div>
+</div>
 </section>
 
 <section id="blackjack" class="panel">
-<h2>🃏 Blackjack</h2>
-<p>Beat the dealer without going over 21. Dealer stands on 17.</p>
-<label>Bet</label>
-<input id="bjBet" type="number" min="1" value="50">
-<label>Side bet (optional)</label>
-<input id="bjSideBet" type="number" min="0" value="0">
-<p class="muted">Side bet: your first card must match the dealer's first card in both rank and suit. Pays 10× total.</p>
-<button class="action" id="bjStart" onclick="startBJ()">DEAL</button>
-<div id="dealerArea"></div>
-<div id="playerArea"></div>
-<div id="bjActions" style="display:none">
-<button class="action" onclick="hitBJ()">HIT</button>
-<button class="action" onclick="standBJ()">STAND</button>
-<button class="action" onclick="doubleBJ()">DOUBLE DOWN</button>
-<button class="action" onclick="splitBJ()">SPLIT</button>
+<h2>♠ ROYAL BLACKJACK</h2>
+<p class="muted">Welcome to the table. Good luck!</p>
+<div class="casino-table">
+<div class="dealer">
+<div class="avatar">👩🏻‍💼</div>
+<div class="dealername">YOUR DEALER</div>
+<div class="muted">Dealer stands on 17</div>
+</div>
+<div class="tabletitle">♠ ROYAL BLACKJACK ♠</div>
+<div id="dealerArea" class="tablearea"><h3>DEALER</h3><p>Waiting for cards...</p></div>
+<div class="chips">🔴 ⚫ 🟣 🔵</div>
+<div id="playerArea" class="tablearea"><h3>YOUR HAND</h3><p>Place your bet and deal!</p></div>
+<div class="betbox">
+<label>Your bet</label><input id="bjBet" type="number" min="1" value="50">
+<label>Perfect Pair side bet</label><input id="bjSideBet" type="number" min="0" value="0">
+<p class="muted">Same rank and suit as dealer's first card pays 10×. Six decks are used.</p>
+<button class="gold" id="bjStart" style="width:100%" onclick="startBJ()">🃏 DEAL CARDS</button>
+</div>
+<div id="bjActions" class="bjcontrols" style="display:none">
+<button class="green" onclick="hitBJ()">＋ HIT</button>
+<button class="redbtn" onclick="standBJ()">✋ STAND</button>
+<button class="bluebtn" onclick="splitBJ()">▣ SPLIT</button>
+<button class="action" onclick="doubleBJ()">2× DOUBLE</button>
 </div>
 <div id="bjResult"></div>
+</div>
 </section>
 </main>
-
-<footer>
-Tap Simulator Reborn · Virtual tokens only · No real money
-</footer>
+</div>
+<footer>Tap Simulator Reborn · Virtual tokens only · No real money</footer>
 
 <script>
-const START_BALANCE=1000;
+const START=1000;
 let balance;
-try {
-  balance=Number(localStorage.getItem("tsr_balance"));
-  if(!Number.isSafeInteger(balance)||balance<0) balance=START_BALANCE;
-} catch(e) {
-  balance=START_BALANCE;
-}
-
-function save(){
-  try{localStorage.setItem("tsr_balance",String(balance))}catch(e){}
-  document.getElementById("balance").textContent=balance.toLocaleString("sv-SE");
-}
-function say(text,type=""){
-  const el=document.getElementById("message");
-  el.textContent=text;
-  el.className=type;
-}
-function validBet(value,min=1){
-  const n=Number(value);
-  return Number.isSafeInteger(n)&&n>=min&&n<=balance?n:0;
-}
-function showGame(id,button){
-  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-  button.classList.add("active");
-  say("");
-}
+try{balance=Number(localStorage.getItem("tsr_balance"));if(!Number.isSafeInteger(balance)||balance<0)balance=START}catch(e){balance=START}
+function save(){try{localStorage.setItem("tsr_balance",String(balance))}catch(e){}document.getElementById("balance").textContent=balance.toLocaleString("sv-SE")}
+function msg(t){document.getElementById("message").textContent=t}
+function betValue(id,min=1){let n=Number(document.getElementById(id).value);return Number.isSafeInteger(n)&&n>=min&&n<=balance?n:0}
+function show(id,b){document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");msg("")}
 save();
 
 // TAP
 let taps=0;
-function tap(){
-  if(balance>=Number.MAX_SAFE_INTEGER-1)return say("Balance limit reached.","bad");
-  balance++;
-  taps++;
-  document.getElementById("tapCount").textContent=taps;
-  save();
-  say("+1 token!","good");
-}
+function tap(){if(balance>=Number.MAX_SAFE_INTEGER)return msg("Balance limit reached.");balance++;taps++;document.getElementById("tapCount").textContent=taps;save();msg("+1 token!")}
 
 // MINES
-let minesGame=null;
+let mg=null;
 function startMines(){
-  if(minesGame&&!minesGame.done)return say("Finish your current Mines game first.","bad");
-  const bet=validBet(document.getElementById("mineBet").value);
-  const count=Number(document.getElementById("mineCount").value);
-  if(!bet)return say("Invalid bet or not enough tokens.","bad");
-  balance-=bet;
-  const positions=Array.from({length:25},(_,i)=>i);
-  for(let i=positions.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [positions[i],positions[j]]=[positions[j],positions[i]];
-  }
-  minesGame={bet,count,bombs:new Set(positions.slice(0,count)),revealed:new Set(),done:false};
-  save();
-  drawMines();
-  say("Game started. Find safe tiles!","good");
+ if(mg&&!mg.done)return msg("Finish your current game first.");
+ let bet=betValue("mineBet"),count=Number(document.getElementById("mineCount").value);
+ if(!bet)return msg("Invalid bet or not enough tokens.");
+ balance-=bet;
+ let arr=Array.from({length:25},(_,i)=>i);
+ for(let i=24;i>0;i--){let j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}
+ mg={bet,count,bombs:new Set(arr.slice(0,count)),open:new Set(),done:false};
+ save();drawMines();msg("Game started!");
 }
-function drawMines(revealAll=false){
-  const grid=document.getElementById("mineGrid");
-  grid.innerHTML="";
-  if(!minesGame)return;
-  for(let i=0;i<25;i++){
-    const b=document.createElement("button");
-    b.className="mineCell";
-    const isBomb=minesGame.bombs.has(i);
-    const open=minesGame.revealed.has(i)||revealAll;
-    b.textContent=open?(isBomb?"💣":"💎"):"?";
-    if(open)b.classList.add(isBomb?"bomb":"revealed");
-    b.disabled=open||minesGame.done;
-    b.onclick=()=>revealMine(i);
-    grid.appendChild(b);
-  }
-  const k=minesGame.revealed.size;
-  let probability=1;
-  for(let i=0;i<k;i++)probability*=((25-minesGame.count-i)/(25-i));
-  const mult=k?0.8/probability:0;
-  document.getElementById("mineInfo").textContent=
-    "Safe tiles: "+k+" · Cashout multiplier: "+mult.toFixed(2)+"× · Bet: "+minesGame.bet;
+function drawMines(all=false){
+ let grid=document.getElementById("mineGrid");grid.innerHTML="";
+ if(!mg)return;
+ for(let i=0;i<25;i++){
+  let b=document.createElement("button"),bomb=mg.bombs.has(i),open=mg.open.has(i)||all;
+  b.className="mineCell";b.textContent=open?(bomb?"💣":"💎"):"?";
+  if(open)b.classList.add(bomb?"bomb":"revealed");
+  b.disabled=open||mg.done;b.onclick=()=>reveal(i);grid.appendChild(b);
+ }
+ let k=mg.open.size,p=1;for(let i=0;i<k;i++)p*=(25-mg.count-i)/(25-i);
+ document.getElementById("mineInfo").textContent="Safe: "+k+" · Multiplier: "+(k?(.8/p).toFixed(2):"0")+"×";
 }
-function revealMine(i){
-  if(!minesGame||minesGame.done||minesGame.revealed.has(i))return;
-  minesGame.revealed.add(i);
-  if(minesGame.bombs.has(i)){
-    minesGame.done=true;
-    drawMines(true);
-    document.getElementById("mineInfo").textContent="BOOM! You lost "+minesGame.bet+" tokens.";
-    say("💥 You hit a mine!","bad");
-    return;
-  }
-  drawMines();
-  say("Safe! You can keep playing or cash out.","good");
+function reveal(i){
+ if(!mg||mg.done||mg.open.has(i))return;
+ mg.open.add(i);
+ if(mg.bombs.has(i)){mg.done=true;drawMines(true);document.getElementById("mineInfo").textContent="BOOM! You lost.";return msg("💥 You hit a mine!")}
+ drawMines();msg("Safe tile! Keep playing or cash out.");
 }
 function cashoutMines(){
-  if(!minesGame||minesGame.done||minesGame.revealed.size===0)return say("Reveal a safe tile first.","bad");
-  let probability=1;
-  const k=minesGame.revealed.size;
-  for(let i=0;i<k;i++)probability*=((25-minesGame.count-i)/(25-i));
-  const payout=Math.floor(minesGame.bet*0.8/probability);
-  minesGame.done=true;
-  balance+=payout;
-  drawMines();
-  document.getElementById("mineInfo").textContent="Cashed out: "+payout+" tokens.";
-  save();
-  say("You cashed out "+payout+" tokens!","good");
+ if(!mg||mg.done||!mg.open.size)return msg("Reveal a safe tile first.");
+ let p=1,k=mg.open.size;for(let i=0;i<k;i++)p*=(25-mg.count-i)/(25-i);
+ let payout=Math.floor(mg.bet*.8/p);mg.done=true;balance+=payout;drawMines();save();
+ document.getElementById("mineInfo").textContent="Cashed out: "+payout+" tokens";msg("You won "+payout+" tokens!");
 }
 
 // COIN FLIP
 function flipCoin(){
-  const bet=validBet(document.getElementById("coinBet").value);
-  if(!bet)return say("Invalid bet or not enough tokens.","bad");
-  balance-=bet;
-  const chosen=document.getElementById("coinSide").value;
-  const won=Math.random()<0.4;
-  const result=won?chosen:(chosen==="heads"?"tails":"heads");
-  document.getElementById("coinResult").textContent=result==="heads"?"🪙 HEADS":"🪙 TAILS";
-  if(won){
-    balance+=bet*2;
-    say("You won! +"+bet+" net tokens.","good");
-  }else{
-    say("You lost "+bet+" tokens.","bad");
-  }
-  save();
+ let bet=betValue("coinBet");if(!bet)return msg("Invalid bet or not enough tokens.");
+ balance-=bet;
+ let chosen=document.getElementById("coinSide").value,win=Math.random()<.4;
+ let result=win?chosen:(chosen==="heads"?"tails":"heads");
+ let visual=document.getElementById("coinVisual");visual.classList.remove("coin");void visual.offsetWidth;visual.classList.add("coin");
+ visual.textContent=result==="heads"?"👑":"🪙";
+ document.getElementById("coinResult").textContent=result.toUpperCase();
+ if(win){balance+=bet*2;msg("You won! +"+bet+" net tokens.")}else msg("You lost "+bet+" tokens.");
+ save();
 }
 
-// BLACKJACK
-const suits=["♠","♥","♦","♣"];
-const ranks=["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+// BLACKJACK - six deck shoe
+const suits=["♠","♥","♦","♣"],ranks=["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 let bj=null;
-function newDeck(){
-  const d=[];
-  for(const s of suits)for(const r of ranks)d.push({s,r});
-  for(let i=d.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [d[i],d[j]]=[d[j],d[i]];
-  }
-  return d;
+function deck(){
+ let d=[];for(let z=0;z<6;z++)for(let s of suits)for(let r of ranks)d.push({s,r});
+ for(let i=d.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]]}
+ return d;
 }
-function drawCard(){return bj.deck.pop()}
-function total(hand){
-  let n=0,a=0;
-  for(const c of hand){
-    if(c.r==="A"){n+=11;a++}
-    else if(["K","Q","J"].includes(c.r))n+=10;
-    else n+=Number(c.r);
-  }
-  while(n>21&&a){n-=10;a--}
-  return n;
+function draw(){return bj.deck.pop()}
+function total(cards){
+ let n=0,a=0;for(let c of cards){if(c.r==="A"){n+=11;a++}else if(["K","Q","J"].includes(c.r))n+=10;else n+=Number(c.r)}
+ while(n>21&&a){n-=10;a--}return n;
 }
-function cardHTML(c){
-  const red=c.s==="♥"||c.s==="♦";
-  return '<span class="card '+(red?"red":"")+'">'+c.r+c.s+'</span>';
-}
+function cardHTML(c){let red=c.s==="♥"||c.s==="♦";return '<span class="card '+(red?"red":"")+'">'+c.r+c.s+'</span>'}
 function startBJ(){
-  if(bj&&!bj.done)return say("Finish your current Blackjack game first.","bad");
-  const bet=validBet(document.getElementById("bjBet").value);
-  const side=Number(document.getElementById("bjSideBet").value);
-  if(!bet||!Number.isSafeInteger(side)||side<0||bet+side>balance)
-    return say("Invalid bet or not enough tokens.","bad");
-  balance-=bet+side;
-  bj={deck:newDeck(),dealer:[],hands:[{cards:[],bet,done:false,split:false}],current:0,side,done:false};
-  bj.hands[0].cards.push(drawCard());
-  bj.dealer.push(drawCard());
-  bj.hands[0].cards.push(drawCard());
-  bj.dealer.push(drawCard());
-
-  let sideWin=false;
-  if(side>0){
-    const p=bj.hands[0].cards[0],d=bj.dealer[0];
-    sideWin=p.r===d.r&&p.s===d.s;
-    if(sideWin)balance+=side*10;
-  }
-  save();
-  document.getElementById("bjResult").textContent=side?(sideWin?"🎉 Perfect match! Side bet paid 10×!":"Side bet lost."):"";
-  document.getElementById("bjStart").disabled=true;
-  document.getElementById("bjActions").style.display="block";
-
-  if(total(bj.hands[0].cards)===21)bj.hands[0].done=true;
-  renderBJ();
-  advanceBJ();
+ if(bj&&!bj.done)return msg("Finish your current hand first.");
+ let bet=betValue("bjBet"),side=Number(document.getElementById("bjSideBet").value);
+ if(!bet||!Number.isSafeInteger(side)||side<0||bet+side>balance)return msg("Invalid bet or not enough tokens.");
+ balance-=bet+side;
+ bj={deck:deck(),dealer:[],hands:[{cards:[],bet:bet,done:false,split:false}],current:0,side:side,done:false};
+ let h=bj.hands[0];h.cards.push(draw(),draw());bj.dealer.push(draw(),draw());
+ let sideWin=side>0&&h.cards[0].r===bj.dealer[0].r&&h.cards[0].s===bj.dealer[0].s;
+ if(sideWin)balance+=side*10;
+ document.getElementById("bjResult").textContent=side?(sideWin?"🎉 PERFECT PAIR! Side bet paid 10×!":"Side bet lost."):"";
+ document.getElementById("bjStart").disabled=true;
+ document.getElementById("bjActions").style.display="flex";
+ if(total(h.cards)===21)h.done=true;
+ save();renderBJ();advanceBJ();
 }
 function renderBJ(){
-  if(!bj)return;
-  document.getElementById("dealerArea").innerHTML=
-    "<h3>Dealer</h3><div class='cards'>"+
-    (bj.done?bj.dealer.map(cardHTML).join(""):cardHTML(bj.dealer[0])+"<span class='card'>?</span>")+
-    "</div>"+(bj.done?"Total: "+total(bj.dealer):"");
-  document.getElementById("playerArea").innerHTML="<h3>Your hands</h3>"+
-    bj.hands.map((h,i)=>"<div class='hand'><b>Hand "+(i+1)+(i===bj.current&&!bj.done?" · YOUR TURN":"")+"</b><div class='cards'>"+
-    h.cards.map(cardHTML).join("")+"</div>Total: "+total(h.cards)+" · Bet: "+h.bet+"</div>").join("");
+ if(!bj)return;
+ let dealer=bj.done?bj.dealer.map(cardHTML).join(""):cardHTML(bj.dealer[0])+'<span class="card back">?</span>';
+ document.getElementById("dealerArea").innerHTML="<h3>DEALER · "+(bj.done?total(bj.dealer):"?")+"</h3><div class='cards'>"+dealer+"</div>";
+ document.getElementById("playerArea").innerHTML="<h3>YOUR HANDS</h3>"+bj.hands.map((h,i)=>"<div class='hand "+(i===bj.current&&!bj.done?"current":"")+"'><b>HAND "+(i+1)+(i===bj.current&&!bj.done?" · YOUR TURN":"")+"</b><div class='cards'>"+h.cards.map(cardHTML).join("")+"</div>Total: "+total(h.cards)+" · Bet: "+h.bet+"</div>").join("");
 }
 function advanceBJ(){
-  if(!bj||bj.done)return;
-  while(bj.current<bj.hands.length&&bj.hands[bj.current].done)bj.current++;
-  if(bj.current>=bj.hands.length)finishBJ();
-  else renderBJ();
+ if(!bj||bj.done)return;
+ while(bj.current<bj.hands.length&&bj.hands[bj.current].done)bj.current++;
+ if(bj.current>=bj.hands.length)finishBJ();else renderBJ();
 }
 function hitBJ(){
-  if(!bj||bj.done)return;
-  const h=bj.hands[bj.current];
-  h.cards.push(drawCard());
-  if(total(h.cards)>=21)h.done=true;
-  advanceBJ();
+ if(!bj||bj.done)return;
+ let h=bj.hands[bj.current];h.cards.push(draw());
+ if(total(h.cards)>=21)h.done=true;
+ advanceBJ();
 }
 function standBJ(){
-  if(!bj||bj.done)return;
-  bj.hands[bj.current].done=true;
-  bj.current++;
-  advanceBJ();
+ if(!bj||bj.done)return;
+ bj.hands[bj.current].done=true;bj.current++;advanceBJ();
 }
 function doubleBJ(){
-  if(!bj||bj.done)return;
-  const h=bj.hands[bj.current];
-  if(h.cards.length!==2)return say("Double Down is only available on your first two cards.","bad");
-  if(balance<h.bet)return say("Not enough tokens to double.","bad");
-  balance-=h.bet;
-  h.bet*=2;
-  h.cards.push(drawCard());
-  h.done=true;
-  save();
-  bj.current++;
-  advanceBJ();
+ if(!bj||bj.done)return;
+ let h=bj.hands[bj.current];
+ if(h.cards.length!==2)return msg("Double Down only works on your first two cards.");
+ if(balance<h.bet)return msg("Not enough tokens to double.");
+ balance-=h.bet;h.bet*=2;h.cards.push(draw());h.done=true;save();bj.current++;advanceBJ();
 }
 function splitBJ(){
-  if(!bj||bj.done)return;
-  const h=bj.hands[bj.current];
-  if(h.cards.length!==2||h.cards[0].r!==h.cards[1].r)
-    return say("You need a matching pair to split.","bad");
-  if(bj.hands.length>=3)return say("Maximum 3 hands.","bad");
-  if(balance<h.bet)return say("Not enough tokens to split.","bad");
-  balance-=h.bet;
-  const second=h.cards.pop();
-  const next={cards:[second],bet:h.bet,done:false,split:true};
-  h.split=true;
-  h.cards.push(drawCard());
-  next.cards.push(drawCard());
-  if(total(h.cards)>=21)h.done=true;
-  if(total(next.cards)>=21)next.done=true;
-  bj.hands.splice(bj.current+1,0,next);
-  save();
-  advanceBJ();
+ if(!bj||bj.done)return;
+ let h=bj.hands[bj.current];
+ if(h.cards.length!==2||h.cards[0].r!==h.cards[1].r)return msg("You need a matching pair to split.");
+ if(bj.hands.length>=3)return msg("Maximum 3 hands.");
+ if(balance<h.bet)return msg("Not enough tokens to split.");
+ balance-=h.bet;
+ let second=h.cards.pop();
+ let next={cards:[second,draw()],bet:h.bet,done:false,split:true};
+ h.split=true;h.cards.push(draw());
+ if(total(h.cards)>=21)h.done=true;
+ if(total(next.cards)>=21)next.done=true;
+ bj.hands.splice(bj.current+1,0,next);save();advanceBJ();
 }
 function finishBJ(){
-  if(!bj||bj.done)return;
-  while(total(bj.dealer)<17)bj.dealer.push(drawCard());
-  const dt=total(bj.dealer);
-  let paid=0,summary=[];
-  for(const h of bj.hands){
-    const pt=total(h.cards);
-    let p=0,result="LOSE";
-    const natural=!h.split&&h.cards.length===2&&pt===21;
-    const dealerNatural=bj.dealer.length===2&&dt===21;
-    if(pt<=21){
-      if(natural&&dealerNatural){p=h.bet;result="PUSH"}
-      else if(natural){p=Math.floor(h.bet*2.5);result="BLACKJACK"}
-      else if(dt>21||pt>dt){p=h.bet*2;result="WIN"}
-      else if(pt===dt){p=h.bet;result="PUSH"}
-    }
-    paid+=p;
-    summary.push(result+" ("+p+")");
+ if(!bj||bj.done)return;
+ let dealerTotal=total(bj.dealer);
+ // Dealer draws unless all player hands have busted
+ if(bj.hands.some(h=>total(h.cards)<=21)){
+  while(total(bj.dealer)<17)bj.dealer.push(draw());
+ }
+ dealerTotal=total(bj.dealer);
+ let paid=0,summary=[];
+ for(let h of bj.hands){
+  let pt=total(h.cards),p=0,result="LOSE";
+  let natural=!h.split&&h.cards.length===2&&pt===21;
+  let dealerNatural=bj.dealer.length===2&&dealerTotal===21;
+  if(pt<=21){
+   if(natural&&dealerNatural){p=h.bet;result="PUSH"}
+   else if(natural){p=Math.floor(h.bet*2.5);result="BLACKJACK"}
+   else if(dealerTotal>21||pt>dealerTotal){p=h.bet*2;result="WIN"}
+   else if(pt===dealerTotal){p=h.bet;result="PUSH"}
   }
-  balance+=paid;
-  bj.done=true;
-  save();
-  document.getElementById("bjActions").style.display="none";
-  document.getElementById("bjStart").disabled=false;
-  document.getElementById("bjResult").textContent=
-    "Dealer: "+dt+" · "+summary.join(" | ")+" · Total payout: "+paid+" tokens";
-  renderBJ();
-  say("Round finished!","good");
+  paid+=p;summary.push("Hand "+(summary.length+1)+": "+result);
+ }
+ balance+=paid;bj.done=true;save();
+ document.getElementById("bjActions").style.display="none";
+ document.getElementById("bjStart").disabled=false;
+ document.getElementById("bjResult").textContent=summary.join(" · ")+" · Payout: "+paid+" tokens";
+ renderBJ();msg("Blackjack round finished!");
 }
 </script>
 </body>
 </html>
+
